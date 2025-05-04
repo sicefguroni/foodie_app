@@ -42,7 +42,6 @@ class FirstRoute extends StatelessWidget {
                         MaterialPageRoute(builder: (context) => SecondRoute()),
                       );
                     },
-                    fontSize: 12,
                   ),
                 ],
               ),

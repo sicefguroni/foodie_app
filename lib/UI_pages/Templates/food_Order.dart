@@ -83,30 +83,11 @@ class FoodTemplate extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Heading3_Text(text: 'Total: P100', color: Colors.black),
-                          Padding(
-                            padding: EdgeInsets.zero,
-                            child: Row(
-                              children: [
-                                IconButton(
-                                  padding: EdgeInsets.zero,
-                                  icon: Icon(Icons.remove),
-                                  iconSize: 12,
-                                  onPressed: () {},
-                                ),
-                                Text('12'),
-                                IconButton(
-                                  padding: EdgeInsets.zero,
-                                  icon: Icon(Icons.add),
-                                  iconSize: 12,
-                                  onPressed: () {},
-                                ),
-                              ],
-                            ),
-                          ),
+                          Heading4_Text(text: 'Total: P100', color: Colors.black),
+                          AddRemoveButton(),
                         ],
                       ),
-                      ActionButton(buttonName: 'Add to Cart', onPressed: () {}, fontSize: 16, backgroundColor: c_pri_yellow)
+                      ActionButton(buttonName: 'Add to Cart', onPressed: () {}, backgroundColor: c_pri_yellow)
                     ],
                   ),
                 ),

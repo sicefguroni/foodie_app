@@ -20,30 +20,47 @@ class CustomerHomeTab extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TitleSectionButton(
-              leftmost: IconButton(
-                icon: Icon(Icons.shopping_cart),
+            Container(
+              decoration: BoxDecoration(
                 color: c_pri_yellow,
-                onPressed: () {
-                  Navigator.push(context, 
-                    MaterialPageRoute(builder: (context) => CustomerCartPage())
-                  );
-                },
+                borderRadius: BorderRadius.only(bottomLeft: Radius.circular(16), bottomRight: Radius.circular(16))
               ),
-              right: IconButton(onPressed: () {}, icon: Icon(Icons.notifications), color: c_pri_yellow),
-              rightmost: ProfileButton(iconColor: c_pri_yellow, 
-                onPressed: () {
-                  return ProfilePage();
-                },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  TitleSectionButton(
+                    leftmost: IconButton(
+                      icon: Icon(Icons.shopping_cart),
+                      color: c_white,
+                      onPressed: () {
+                        Navigator.push(context, 
+                          MaterialPageRoute(builder: (context) => CustomerCartPage())
+                        );
+                      },
+                    ),
+                    right: IconButton(onPressed: () {}, icon: Icon(Icons.notifications), color: c_white),
+                    rightmost: ProfileButton(iconColor: c_white, 
+                      onPressed: () {
+                        return ProfilePage();
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Heading3_Text(text: 'What foodie', color: c_white),
+                        Heading3_Text(text: 'would you like?', color: c_white),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+                    child: CustomSearchBar(),
+                  ),
+                ],
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 0, 0, 4),
-              child: Heading3_Text(text: 'What foodie would you like?', color: c_pri_yellow),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 0, 12, 4),
-              child: CustomSearchBar(),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 0, 4),

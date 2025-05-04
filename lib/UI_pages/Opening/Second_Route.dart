@@ -19,9 +19,10 @@ class SecondRoute extends StatelessWidget {
           const SizedBox(height: 75),
           Container(
             width: double.infinity,
-            margin: const EdgeInsets.all(1),
+            padding: EdgeInsets.all(24),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 NormalButton(
                   buttonName: 'Customer',
@@ -35,7 +36,7 @@ class SecondRoute extends StatelessWidget {
                     );
                   },
                 ),
-                const SizedBox(height: 20), // Add spacing between buttons
+                const SizedBox(height: 24), // Add spacing between buttons
                 NormalButton(
                   buttonName: 'Admin',
                   fontColor: c_white,
