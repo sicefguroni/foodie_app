@@ -4,6 +4,8 @@ import 'package:foodie_app/utilities/utilities_buttons.dart';
 import 'utilities_others.dart';
 import '../UI_pages/Templates/food_Order.dart';
 
+// SAMPLE CARD INPUTS
+// SAMPLE CARD INPUTS
 final List<Category> _categories = [
   Category(assetName: 'lib/images/opening-image.png', name: 'Vegetables', status: 'Available', detail: 'By kilo', isSelected: false),
   Category(assetName: 'lib/images/opening-image.png', name: 'Vegetables', status: 'Available', detail: 'By kilo', isSelected: false),
@@ -25,84 +27,9 @@ class Category {
   Category({required this.assetName, required this.name, required this.status, required this.detail, this.isSelected = false});
 }
 
-class FoodCards extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: .9,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-      ),
-      padding: EdgeInsets.all(8),
-      itemCount: _categories.length,
-      itemBuilder: (context, index) {
-        return FoodCard(category: _categories[index]);
-      },
-    );
-  }
-}
 
-class FoodCard extends StatefulWidget {
-  final Category category;
-
-  const FoodCard({
-    required this.category, 
-    Key? key,
-  }) : super(key: key);
-  
-  @override
-  State<FoodCard> createState() => _FoodCardState();
-}
-
-class _FoodCardState extends State<FoodCard> {
-  @override
-  Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double titleFontSize = screenWidth * 0.04;
-    double subtitleFontSize = screenWidth * 0.04;
-
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => FoodTemplate())
-          );
-        },
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: Image.asset(widget.category.assetName, fit: BoxFit.cover),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(8, 4, 0, 4),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                     Text(
-                      widget.category.name,
-                      style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: titleFontSize),
-                    ),
-                    Text(
-                      widget.category.status,
-                      style: TextStyle(fontFamily: 'Inter', fontSize: subtitleFontSize),
-                    ),
-                  ],
-                ),
-              )
-            ],
-          ),
-      ),
-    );
-  }
-}
-
+// FOUND IN ad_IngredientsTab && ad_FoodTab && cust_HomeTab
+// FOUND IN ad_IngredientsTab && ad_FoodTab && cust_HomeTab
 class CategoryCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -173,7 +100,10 @@ class _CategoryCardState extends State<CategoryCard> {
   }
 }
 
-class IngredientCards extends StatelessWidget {
+
+// FOUND IN ad_IngredientsTab
+// FOUND IN ad_IngredientsTab
+class AdminIngredientCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -184,34 +114,31 @@ class IngredientCards extends StatelessWidget {
       padding: EdgeInsets.all(8),
       itemCount: _categories.length,
       itemBuilder: (context, index) {
-        return IngredientCard(category: _categories[index]);
+        return AdminIngredientCard(category: _categories[index]);
       }
     );
   }
 }
 
-class IngredientCard extends StatefulWidget {
+class AdminIngredientCard extends StatefulWidget {
   final Category category;
 
-  const IngredientCard({
+  const AdminIngredientCard({
     required this.category, 
     Key? key,
   }) : super(key: key);
    
   @override
-  State<IngredientCard> createState() => _IngredientCardState();
+  State<AdminIngredientCard> createState() => _AdminIngredientCardState();
 }
 
-class _IngredientCardState extends State<IngredientCard> {
+class _AdminIngredientCardState extends State<AdminIngredientCard> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double imageWidth = screenWidth * 0.2;
     double titleFontSize = screenWidth * 0.045;
     double subtitleFontSize = screenWidth * 0.04;
-    double quantityBoxSize = screenWidth * 0.06;
-    double iconButtonSize = screenWidth * 0.05;
-
 
     return Card(
       elevation: 1,
@@ -267,241 +194,91 @@ class _IngredientCardState extends State<IngredientCard> {
   }
 } 
 
-class CartCards extends StatelessWidget {
+
+// FOUND IN ad_FoodTab
+// FOUND IN ad_FoodTab
+class AdminFoodCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 1,
-      childAspectRatio: 3,
-
-      ), 
-      padding: EdgeInsets.symmetric(horizontal: 8),
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: .9,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+      ),
+      padding: EdgeInsets.all(8),
       itemCount: _categories.length,
       itemBuilder: (context, index) {
-        return CartCard(category: _categories[index], index: index);
-      }
+        return AdminFoodCard(category: _categories[index]);
+      },
     );
   }
 }
 
-class CartCard extends StatefulWidget {
+class AdminFoodCard extends StatefulWidget {
   final Category category;
-  final int index;
 
-  const CartCard({
+  const AdminFoodCard({
     required this.category, 
-    required this.index,
     Key? key,
   }) : super(key: key);
-   
+  
   @override
-  State<CartCard> createState() => _CartCardState();
+  State<AdminFoodCard> createState() => _AdminFoodCardState();
 }
 
-class _CartCardState extends State<CartCard> {
+class _AdminFoodCardState extends State<AdminFoodCard> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double imageWidth = screenWidth * 0.25;
-    double titleFontSize = screenWidth * 0.045;
+    double titleFontSize = screenWidth * 0.04;
     double subtitleFontSize = screenWidth * 0.04;
-    double quantityBoxSize = screenWidth * 0.07;
-    double iconButtonSize = screenWidth * 0.04;
-
-    bool isAllSelected = false;
-
-    void toggleSelectAll() {
-    setState(() {
-      isAllSelected = !isAllSelected;
-      for (var category in _categories) {
-        category.isSelected = isAllSelected;
-      }
-      });
-    }
-
-    void toggleSelection() {
-      setState(() {
-        _categories[widget.index].isSelected = !_categories[widget.index].isSelected;
-        isAllSelected = _categories.every((category) => category.isSelected);
-      }
-      );
-    }
 
     return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(4, 2, 0, 2), // Add the required padding
-            child: Row(// Image container
-              children: [
-                Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: SizedBox(
-                    width: imageWidth,
-                    child: Image.asset(
-                      widget.category.assetName,
-                      fit: BoxFit.cover,
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => FoodTemplate())
+          );
+        },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: Image.asset(widget.category.assetName, fit: BoxFit.cover),
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(8, 4, 0, 4),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                     Text(
+                      widget.category.name,
+                      style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: titleFontSize),
                     ),
-                  ),
+                    Text(
+                      widget.category.status,
+                      style: TextStyle(fontFamily: 'Inter', fontSize: subtitleFontSize),
+                    ),
+                  ],
                 ),
-                // Name text below the container
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(4, 12, 0, 0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.category.name,
-                        style: TextStyle(fontFamily: 'Inter', fontSize: titleFontSize),
-                      ),
-                      Text(
-                        widget.category.detail,
-                        style: TextStyle(fontFamily: 'Inter', fontSize: subtitleFontSize),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+              )
+            ],
           ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(0, 4, 4, 4), // Add the required padding
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Checkbox(value: widget.category.isSelected, onChanged: (_) => toggleSelection()),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 8, 4),
-                  child: AddRemoveButton(),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
-    );
-  }
-} 
-
-class CheckoutCards extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 1,
-      childAspectRatio: 3,
-
-      ), 
-      padding: EdgeInsets.symmetric(horizontal: 8),
-      itemCount: _categories.length,
-      itemBuilder: (context, index) {
-        return CheckoutCard(category: _categories[index], index: index);
-      }
     );
   }
 }
 
-class CheckoutCard extends StatefulWidget {
-  final Category category;
-  final int index;
 
-  const CheckoutCard({
-    required this.category, 
-    required this.index,
-    Key? key,
-  }) : super(key: key);
-   
-  @override
-  State<CheckoutCard> createState() => _CheckoutCardState();
-}
-
-class _CheckoutCardState extends State<CheckoutCard> {
-  @override
-  Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double imageWidth = screenWidth * 0.25;
-    double titleFontSize = screenWidth * 0.045;
-    double subtitleFontSize = screenWidth * 0.04;
-    double quantityBoxSize = screenWidth * 0.06;
-    double iconButtonSize = screenWidth * 0.04;
-
-    bool isAllSelected = false;
-
-    void toggleSelection() {
-      setState(() {
-        _categories[widget.index].isSelected = !_categories[widget.index].isSelected;
-        isAllSelected = _categories.every((category) => category.isSelected);
-      }
-      );
-    }
-
-    return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(4, 2, 0, 2), // Add the required padding
-            child: Row(// Image container
-              children: [
-                Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: SizedBox(
-                    width: imageWidth,
-                    child: Image.asset(
-                      widget.category.assetName,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                // Name text below the container
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(4, 12, 0, 0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.category.name,
-                        style: TextStyle(fontFamily: 'Inter', fontSize: titleFontSize),
-                      ),
-                      Text(
-                        widget.category.detail,
-                        style: TextStyle(fontFamily: 'Inter', fontSize: subtitleFontSize),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(0, 12, 12, 8), // Add the required padding
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text('x1', style: TextStyle(fontFamily: 'Inter', fontSize: subtitleFontSize)),
-                Text('P100', style: TextStyle(fontFamily: 'Inter', fontSize: titleFontSize)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-} 
-
-class AvatarCards extends StatelessWidget {
+// FOUND IN ad_OrdersTab
+// FOUND IN ad_OrdersTab
+class AdminOrdersCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
@@ -513,25 +290,25 @@ class AvatarCards extends StatelessWidget {
       padding: EdgeInsets.all(8),
       itemCount: _categories.length,
       itemBuilder: (context, index) {
-        return AvatarCard(category: _categories[index]);
+        return AdminOrdersCard(category: _categories[index]);
       },
     );
   }
 }
 
-class AvatarCard extends StatefulWidget {
+class AdminOrdersCard extends StatefulWidget {
   final Category category;
 
-  const AvatarCard({
+  const AdminOrdersCard({
     required this.category, 
     Key? key,
   }) : super(key: key);
   
   @override
-  State<AvatarCard> createState() => _AvatarCardState();
+  State<AdminOrdersCard> createState() => _AdminOrdersCardState();
 }
 
-class _AvatarCardState extends State<AvatarCard> {
+class _AdminOrdersCardState extends State<AdminOrdersCard> {
   
 
   @override
@@ -630,6 +407,8 @@ class _AvatarCardState extends State<AvatarCard> {
   }
 } 
 
+// SAMPLE STATUS INPUTS
+// SAMPLE STATUS INPUTS
 final List<Status> _statuses = [
   Status(statusName: 'Pending'),
   Status(statusName: 'Accepted'),
@@ -644,7 +423,10 @@ class Status {
   Status({required this.statusName});
 }
 
-class StatusCards extends StatelessWidget {
+
+// FOUND IN ad_OrdersTab
+// FOUND IN ad_OrdersTab
+class OrderStatusCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -654,26 +436,26 @@ class StatusCards extends StatelessWidget {
       itemBuilder: (context, index) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: StatusCard(status: _statuses[index]),
+          child: OrderStatusCard(status: _statuses[index]),
         );
       },
     );
   }
 }
 
-class StatusCard extends StatefulWidget {
+class OrderStatusCard extends StatefulWidget {
   final Status status;
 
-  const StatusCard({
+  const OrderStatusCard({
     required this.status, 
     Key? key,
   }) : super(key: key);
   
   @override
-  State<StatusCard> createState() => _StatusCardState();
+  State<OrderStatusCard> createState() => _OrderStatusCardState();
 }
 
-class _StatusCardState extends State<StatusCard> {
+class _OrderStatusCardState extends State<OrderStatusCard> {
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
@@ -685,3 +467,240 @@ class _StatusCardState extends State<StatusCard> {
     );
   }
 }
+
+
+// NAMED cust_Cart && FOUND IN cust_HomeTab & cust_OrdersTab
+// NAMED cust_Cart && FOUND IN cust_HomeTab & cust_OrdersTab
+class CartCards extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 1,
+      childAspectRatio: 3,
+
+      ), 
+      padding: EdgeInsets.symmetric(horizontal: 8),
+      itemCount: _categories.length,
+      itemBuilder: (context, index) {
+        return CartCard(category: _categories[index], index: index);
+      }
+    );
+  }
+}
+
+class CartCard extends StatefulWidget {
+  final Category category;
+  final int index;
+
+  const CartCard({
+    required this.category, 
+    required this.index,
+    Key? key,
+  }) : super(key: key);
+   
+  @override
+  State<CartCard> createState() => _CartCardState();
+}
+
+class _CartCardState extends State<CartCard> {
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double imageWidth = screenWidth * 0.25;
+    double titleFontSize = screenWidth * 0.045;
+    double subtitleFontSize = screenWidth * 0.04;
+
+    bool isAllSelected = false;
+
+    void toggleSelectAll() {
+    setState(() {
+      isAllSelected = !isAllSelected;
+      for (var category in _categories) {
+        category.isSelected = isAllSelected;
+      }
+      });
+    }
+
+    void toggleSelection() {
+      setState(() {
+        _categories[widget.index].isSelected = !_categories[widget.index].isSelected;
+        isAllSelected = _categories.every((category) => category.isSelected);
+      }
+      );
+    }
+
+    return Card(
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(4, 2, 0, 2), // Add the required padding
+            child: Row(// Image container
+              children: [
+                Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: SizedBox(
+                    width: imageWidth,
+                    child: Image.asset(
+                      widget.category.assetName,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                // Name text below the container
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(4, 12, 0, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.category.name,
+                        style: TextStyle(fontFamily: 'Inter', fontSize: titleFontSize),
+                      ),
+                      Text(
+                        widget.category.detail,
+                        style: TextStyle(fontFamily: 'Inter', fontSize: subtitleFontSize),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(0, 4, 4, 4), // Add the required padding
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Checkbox(value: widget.category.isSelected, onChanged: (_) => toggleSelection()),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 8, 4),
+                  child: AddRemoveButton(),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+} 
+
+
+// NAMED cust_Checkout && FOUND AFTER cust_Cart via Button
+// NAMED cust_Checkout && FOUND AFTER cust_Cart via Button
+class CheckoutCards extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 1,
+      childAspectRatio: 3,
+
+      ), 
+      padding: EdgeInsets.symmetric(horizontal: 8),
+      itemCount: _categories.length,
+      itemBuilder: (context, index) {
+        return CheckoutCard(category: _categories[index], index: index);
+      }
+    );
+  }
+}
+
+class CheckoutCard extends StatefulWidget {
+  final Category category;
+  final int index;
+
+  const CheckoutCard({
+    required this.category, 
+    required this.index,
+    Key? key,
+  }) : super(key: key);
+   
+  @override
+  State<CheckoutCard> createState() => _CheckoutCardState();
+}
+
+class _CheckoutCardState extends State<CheckoutCard> {
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double imageWidth = screenWidth * 0.25;
+    double titleFontSize = screenWidth * 0.045;
+    double subtitleFontSize = screenWidth * 0.04;
+ 
+    bool isAllSelected = false;
+
+    void toggleSelection() {
+      setState(() {
+        _categories[widget.index].isSelected = !_categories[widget.index].isSelected;
+        isAllSelected = _categories.every((category) => category.isSelected);
+      }
+      );
+    }
+
+    return Card(
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(4, 2, 0, 2), // Add the required padding
+            child: Row(// Image container
+              children: [
+                Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: SizedBox(
+                    width: imageWidth,
+                    child: Image.asset(
+                      widget.category.assetName,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                // Name text below the container
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(4, 12, 0, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.category.name,
+                        style: TextStyle(fontFamily: 'Inter', fontSize: titleFontSize),
+                      ),
+                      Text(
+                        widget.category.detail,
+                        style: TextStyle(fontFamily: 'Inter', fontSize: subtitleFontSize),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(0, 12, 12, 8), // Add the required padding
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text('x1', style: TextStyle(fontFamily: 'Inter', fontSize: subtitleFontSize)),
+                Text('P100', style: TextStyle(fontFamily: 'Inter', fontSize: titleFontSize)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+} 
+

@@ -63,7 +63,6 @@ class SignUpRoute_1st extends StatelessWidget {
                             Navigator.push(context,
                               MaterialPageRoute(builder: (context) => SignUpRoute_2nd()));
                           },
-                          fontSize: 12,
                         ),
                       ],
                   ),
@@ -130,7 +129,6 @@ class SignUpRoute_2nd extends StatelessWidget {
                             Navigator.push(context,
                             MaterialPageRoute(builder: (context) => SecondRoute()));
                           },
-                          fontSize: 12,
                         ),
                       ],
                   ),

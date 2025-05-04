@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'cust_Cart.dart';
+import 'package:foodie_app/utilities/color_palette.dart';
 import 'package:foodie_app/UI_pages/Templates/account_Profile.dart';
 import '../../utilities/utilities_cards.dart';
 import '../../utilities/utilities_buttons.dart';
 import '../../utilities/utilities_others.dart';
 import '../../utilities/utilities_texts.dart';
-
-const Color c_green = Color(0xFF00695C);
-const Color c_white = Color(0xFFFFFFFF);
-const Color c_pri_yellow = Color(0xFFFFA62F);
-const Color c_sec_yellow = Color(0xFFFFC96F);
-const Color c_background = Color(0xFFFFFBD8);
 
 class CustomerHomeTab extends StatelessWidget {
   @override
@@ -77,7 +72,7 @@ class CustomerHomeTab extends StatelessWidget {
             ),
             // Vertical scrolling grid that takes remaining space
             Expanded(
-              child: FoodCards(),
+              child: AdminFoodCards(),
             ),
           ],
         ),

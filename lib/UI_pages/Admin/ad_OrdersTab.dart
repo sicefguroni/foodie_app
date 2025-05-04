@@ -42,7 +42,7 @@ class AdminOrdersTab extends StatelessWidget {
             Container(
               height: 35,
               padding: EdgeInsets.fromLTRB(8, 0, 0, 0),
-              child: StatusCards(),
+              child: OrderStatusCards(),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 4, 0, 4),
@@ -50,7 +50,7 @@ class AdminOrdersTab extends StatelessWidget {
             ),
             // Vertical scrolling grid that takes remaining space
             Expanded(
-              child: AvatarCards(),
+              child: AdminOrdersCards(),
             ),
           ],
         ),

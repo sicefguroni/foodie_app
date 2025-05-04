@@ -47,7 +47,7 @@ class AdminIngredientsTab extends StatelessWidget {
                 ),
                 // Vertical scrolling grid that takes remaining space
                 Expanded(
-                  child: IngredientCards(),
+                  child: AdminIngredientCards(),
                 ),
                 
               ],
