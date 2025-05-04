@@ -19,19 +19,26 @@ class AddFoodTemplate extends StatelessWidget {
             SizedBox(height: 8),
             GestureDetector(
               onTap: () {},
-              child: DottedBorder(
-                color: c_pri_yellow,
-                dashPattern: [6,3],
-                borderType: BorderType.RRect,
-                radius: Radius.circular(16),
-                child: Container(
-                  padding: EdgeInsets.fromLTRB(16, 32, 16 ,32),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Icon(Icons.image, size: 32, color: c_pri_yellow),
-                      bodyText(text: 'Upload Image', color: c_pri_yellow),
-                    ],
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                width: double.infinity,
+                child: DottedBorder(
+                  color: c_pri_yellow,
+                  dashPattern: const [6, 3],
+                  borderType: BorderType.RRect,
+                  radius: const Radius.circular(16),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 32), // add spacing
+                    alignment: Alignment.center, // ensure the container centers content
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min, // hug content vertically
+                      mainAxisAlignment: MainAxisAlignment.center, // center vertically
+                      crossAxisAlignment: CrossAxisAlignment.center, // center horizontally
+                      children: [
+                        Icon(Icons.image, size: 32, color: c_pri_yellow),
+                        bodyText(text: 'Upload Image', color: c_pri_yellow),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -151,7 +158,7 @@ class AddFoodTemplate extends StatelessWidget {
                     ),
                     ActionButton(buttonName: 'Add Food', backgroundColor: c_pri_yellow, 
                         onPressed: () { 
-                    }, fontSize: 16)
+                    },)
                   ],
                 ),
               ),

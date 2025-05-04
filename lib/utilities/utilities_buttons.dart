@@ -1,6 +1,103 @@
 import 'package:flutter/material.dart';
 import 'package:foodie_app/utilities/color_palette.dart';
 
+class FAButton extends StatelessWidget {
+  const FAButton({super.key, required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: onPressed,
+      elevation: 2,
+      backgroundColor: c_pri_yellow,
+      foregroundColor: c_white,
+      child: Icon(Icons.add),
+    );
+  }
+}
+
+class AddRemoveButton extends StatelessWidget {
+  const AddRemoveButton({super.key,});
+  
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double iconButtonSize = screenWidth * 0.04;
+    double quantityBoxSize = screenWidth * 0.07;
+    double subtitleFontSize = screenWidth * 0.04;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Remove Button
+        SizedBox(
+          width: quantityBoxSize,
+          height: quantityBoxSize,
+          child: IconButton.filled(
+            onPressed: () {},
+            icon: const Icon(Icons.remove),
+            iconSize: iconButtonSize,
+            style: ButtonStyle(
+              padding: MaterialStateProperty.all(EdgeInsets.zero),
+              shape: MaterialStateProperty.all(
+                const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(4),
+                    bottomLeft: Radius.circular(4),
+                  ),
+                ),
+              ),
+              backgroundColor: MaterialStateProperty.all(c_pri_yellow),
+              foregroundColor: MaterialStateProperty.all(c_white),
+            ),
+          ),
+        ),
+
+        // Quantity Display Box
+        Container(
+          width: quantityBoxSize,
+          height: quantityBoxSize,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            border: Border.all(color: c_pri_yellow),
+          ),
+          child: Text(
+            '00',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: subtitleFontSize),
+          ),
+        ),
+
+        // Add Button
+        SizedBox(
+          width: quantityBoxSize,
+          height: quantityBoxSize,
+          child: IconButton.filled(
+            onPressed: () {},
+            icon: const Icon(Icons.add),
+            iconSize: iconButtonSize,
+            style: ButtonStyle(
+              padding: MaterialStateProperty.all(EdgeInsets.zero),
+              shape: MaterialStateProperty.all(
+                const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(4),
+                    bottomRight: Radius.circular(4),
+                  ),
+                ),
+              ),
+              backgroundColor: MaterialStateProperty.all(c_pri_yellow),
+              foregroundColor: MaterialStateProperty.all(c_white),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class WhiteBackButton extends StatelessWidget{
   const WhiteBackButton({super.key});
 
@@ -40,41 +137,35 @@ class YellowBackButton extends StatelessWidget{
 }
 
 class ActionButton extends StatelessWidget {
-  const ActionButton({super.key, required this.buttonName, this.backgroundColor, required this.onPressed, required this.fontSize});
+  const ActionButton({super.key, required this.buttonName, this.backgroundColor, required this.onPressed});
 
   final String buttonName;
   final Color? backgroundColor;
   final VoidCallback onPressed;
-  final double fontSize;
 
   @override
   Widget build(BuildContext context) {
     final ButtonStyle style = ElevatedButton.styleFrom(
       elevation: 3,
       backgroundColor: backgroundColor,
-      textStyle: TextStyle(fontSize: fontSize),
-      minimumSize: const Size(320, 0),
+      textStyle: TextStyle(fontSize: 14),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
     );
 
     return Container(
-      alignment: Alignment.center,
       width: double.infinity,
-      child:
-      ElevatedButton(
+      child: ElevatedButton(
         style: style, 
         onPressed: onPressed, 
         child: Padding(
-          padding: EdgeInsets.all(16),
-          child:
-            Text(
-              buttonName, 
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: c_white,
-                fontWeight: FontWeight.w700,
-                fontFamily: 'Poppins',
-              ),
+          padding: const EdgeInsets.all(12.0),
+          child: Text(
+            buttonName, 
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: c_white,
+              fontFamily: 'Poppins',
+            ),
           ),
         ),
       ),
@@ -97,32 +188,29 @@ class NormalButton extends StatelessWidget {
       backgroundColor: backgroundColor,
       textStyle: TextStyle(fontSize: 12),
       side: BorderSide(color: outlineColor ?? Colors.transparent),
-      minimumSize: const Size(320, 0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
     );
 
     return Container(
-      alignment: Alignment.center,
       width: double.infinity,
-      child:
-      ElevatedButton(
+      child: ElevatedButton(
         style: style, 
         onPressed: onPressed, 
-        child: Padding(
-          padding: EdgeInsets.all(12),
-          child:
-            Text(
-              buttonName, 
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: fontColor,
-                fontWeight: FontWeight.w700,
-                fontFamily: 'Poppins',
-              ),
-          ),
+        child:
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Text(
+                buttonName, 
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: fontColor,
+                  fontWeight: FontWeight.w700,
+                  fontFamily: 'Poppins',
+                ),
+                        ),
+            ),
         ),
-      ),
-    );
+      );
   }
 }
 

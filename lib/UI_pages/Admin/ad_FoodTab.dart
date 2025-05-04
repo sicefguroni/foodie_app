@@ -55,14 +55,13 @@ class AdminFoodTab extends StatelessWidget {
             Positioned(
               right: 16,
               bottom: 16,
-              child: FloatingActionButton(
+              child: FAButton(
                 onPressed: () {
                   Navigator.push(
                     context, 
                     MaterialPageRoute(builder: (context) => AddFoodTemplate())
                   );
                 },
-                child: Icon(Icons.add),
               ),
             ),
           ],

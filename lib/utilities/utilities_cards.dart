@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodie_app/utilities/color_palette.dart';
+import 'package:foodie_app/utilities/utilities_buttons.dart';
 import 'utilities_others.dart';
 import '../UI_pages/Templates/food_Order.dart';
 
@@ -172,23 +173,6 @@ class _CategoryCardState extends State<CategoryCard> {
   }
 }
 
-
-// class IngredientCards extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return ListView.builder(
-//       itemCount: _categories.length,
-//       padding: EdgeInsets.symmetric(horizontal: 8),
-//       itemBuilder: (context, index) {
-//         return Padding(
-//           padding: const EdgeInsets.symmetric(horizontal: 4),
-//           child: IngredientCard(category: _categories[index]),
-//         );
-//       },
-//     );
-//   }
-// }
-
 class IngredientCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -274,37 +258,8 @@ class _IngredientCardState extends State<IngredientCard> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.fromLTRB(0, 0, 4, 0), // Add the required padding
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                IconButton(
-                  onPressed: () {}, icon: Icon(Icons.remove), iconSize: iconButtonSize
-                  ),
-                Card.outlined(
-                  borderOnForeground: true,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(
-                      color: c_pri_yellow,
-                      width: 1,
-                    ),
-                  ),
-                  child: SizedBox(
-                    width: quantityBoxSize,
-                    child: Text(
-                      '00',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: subtitleFontSize),
-                    ),
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {}, icon: Icon(Icons.add), iconSize: iconButtonSize
-                  
-                ),
-              ],
-            ),
+            padding: EdgeInsets.fromLTRB(0, 0, 8, 0), // Add the required padding
+            child: AddRemoveButton(),
           ),
         ],
       ),
@@ -350,7 +305,7 @@ class _CartCardState extends State<CartCard> {
     double imageWidth = screenWidth * 0.25;
     double titleFontSize = screenWidth * 0.045;
     double subtitleFontSize = screenWidth * 0.04;
-    double quantityBoxSize = screenWidth * 0.06;
+    double quantityBoxSize = screenWidth * 0.07;
     double iconButtonSize = screenWidth * 0.04;
 
     bool isAllSelected = false;
@@ -422,36 +377,9 @@ class _CartCardState extends State<CartCard> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Checkbox(value: widget.category.isSelected, onChanged: (_) => toggleSelection()),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    IconButton(
-                      onPressed: () {}, icon: Icon(Icons.remove), iconSize: iconButtonSize,
-                      constraints: BoxConstraints(minWidth: 24,maxWidth: 32, minHeight: 24, maxHeight: 32),
-                      ),
-                    Card.outlined(
-                      borderOnForeground: true,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        side: BorderSide(
-                          color: c_pri_yellow,
-                          width: 1,
-                        ),
-                      ),
-                      child: SizedBox(
-                        width: quantityBoxSize,
-                        child: Text(
-                          '00',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: subtitleFontSize),
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () {}, icon: Icon(Icons.add), iconSize: iconButtonSize,
-                      constraints: BoxConstraints(minWidth: 24,maxWidth: 32, minHeight: 24, maxHeight: 32),
-                    ),
-                  ],
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 8, 4),
+                  child: AddRemoveButton(),
                 ),
               ],
             ),
@@ -573,22 +501,6 @@ class _CheckoutCardState extends State<CheckoutCard> {
   }
 } 
 
-// class AvatarCards extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return ListView.builder(
-//       itemCount: _categories.length,
-//       padding: EdgeInsets.symmetric(horizontal: 8),
-//       itemBuilder: (context, index) {
-//         return Padding(
-//           padding: const EdgeInsets.symmetric(horizontal: 4),
-//           child: AvatarCard(category: _categories[index]),
-//         );
-//       },
-//     );
-//   }
-// }
-
 class AvatarCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -626,9 +538,10 @@ class _AvatarCardState extends State<AvatarCard> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double avatarRadius = screenWidth * .12;
-    double titleFontSize = screenWidth * 0.04;
-    double descriptionFontSize = screenWidth * 0.038;
-    double buttonFontSize = screenWidth * 0.035;
+    double titleFontSize = screenWidth * 0.045;
+    double descriptionFontSize = screenWidth * 0.04;
+    double buttonFontSize = screenWidth * 0.04;
+    double sizedboxHeight = screenWidth * 0.09;
 
     return Card(
       elevation: 1,
@@ -664,19 +577,45 @@ class _AvatarCardState extends State<AvatarCard> {
                     child: Text(widget.category.status, style: TextStyle(fontSize: descriptionFontSize)),
                   ),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
+                        child: 
+                      SizedBox(
+                        height: sizedboxHeight,
                         child:
-                      ElevatedButton(onPressed: () {}, child: Text('Accept'), 
-                        style: ElevatedButton.styleFrom(
-                        textStyle: TextStyle(fontSize: buttonFontSize))),
+                      ElevatedButton(onPressed: () {}, child: Text('Accept', style: TextStyle(fontSize: buttonFontSize)), 
+                        style: ButtonStyle(
+                          padding: MaterialStateProperty.all(EdgeInsets.all(0)),
+                          shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          backgroundColor: MaterialStateProperty.all(c_pri_yellow),  
+                          foregroundColor: MaterialStateProperty.all(c_white),                        
+                          )),
                       ),
-                      SizedBox(width: 4),
+                      ),
+                      SizedBox(width: 6),
                       Expanded(
                         child: 
-                      ElevatedButton(onPressed: () {}, child: Text('Deny'), 
-                        style: ElevatedButton.styleFrom(
-                        textStyle: TextStyle(fontSize: buttonFontSize))),
+                      SizedBox(
+                        height: sizedboxHeight,
+                        child: 
+                      ElevatedButton(onPressed: () {}, child: Text('Deny', style: TextStyle(fontSize: buttonFontSize),), 
+                        style: ButtonStyle(
+                          padding: MaterialStateProperty.all(EdgeInsets.all(0)),
+                          shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          backgroundColor: MaterialStateProperty.all(c_sec_yellow),  
+                          foregroundColor: MaterialStateProperty.all(c_white),                        
+                          )
+                        ),
+                      ),
                       ),
                     ],
                   ),

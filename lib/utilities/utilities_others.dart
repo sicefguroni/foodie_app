@@ -72,16 +72,22 @@ class CustomSearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return SearchAnchor(
       builder: (BuildContext context, SearchController controller) {
-        return SearchBar(
-          elevation: MaterialStateProperty.all(0.0),
-          controller: controller,
-          padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 16)),
-          onTap: () {
-            controller.openView();
-          },
-          trailing: [
-            Icon(Icons.search),
-          ],
+        return SizedBox(
+          height: 40,
+          child: SearchBar(
+            elevation: MaterialStateProperty.all(0.5),
+            controller: controller,
+            backgroundColor: MaterialStateProperty.all(c_white),
+            padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 8)),
+            shape: MaterialStateProperty.all(
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+            onTap: () {
+              controller.openView();
+            },
+            trailing: [
+              Icon(Icons.search, color: c_pri_yellow),
+            ],
+          ),
         );
       },
       suggestionsBuilder: (BuildContext context, SearchController controller) {
