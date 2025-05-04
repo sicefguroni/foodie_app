@@ -74,7 +74,7 @@ class FoodTemplate extends StatelessWidget {
                             Container(
                               height: 35,
                               margin: EdgeInsets.zero,
-                              child: StatusCards(),
+                              child: OrderStatusCards(),
                                 
                             ),
                           ],

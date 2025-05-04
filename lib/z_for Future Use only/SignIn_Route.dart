@@ -40,7 +40,6 @@ class SignInRoute extends StatelessWidget {
                             Navigator.push(context,
                               MaterialPageRoute(builder: (context) => AdminPage()));
                           },
-                          fontSize: 12,
                         ),
                       ],
                   ),
