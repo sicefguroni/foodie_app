@@ -39,7 +39,7 @@ class AdminFoodTab extends StatelessWidget {
                 // Horizontal scrolling cards with fixed height
                 Container(
                   height: 80,
-                  child: CategoryCards(),
+                  child: FoodCategoryCards(),
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(12, 4, 0, 4),

@@ -4,7 +4,7 @@ import '../../utilities/utilities_buttons.dart';
 import '../../utilities/utilities_texts.dart';
 import '../../utilities/utilities_cards.dart';
 
-class FoodTemplate extends StatelessWidget {
+class CustomerFoodTemplate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,7 +84,7 @@ class FoodTemplate extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Heading4_Text(text: 'Total: P100', color: Colors.black),
-                          AddRemoveButton(),
+                          AddRemoveButton(onChanged: (int ) {  },),
                         ],
                       ),
                       ActionButton(buttonName: 'Add to Cart', onPressed: () {}, backgroundColor: c_pri_yellow)

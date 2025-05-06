@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foodie_app/UI_pages/Templates/add_Food.dart';
+import 'package:foodie_app/UI_pages/Templates/add_Ingredient.dart';
 import 'package:foodie_app/utilities/color_palette.dart';
 import 'package:foodie_app/UI_pages/Templates/account_Profile.dart';
 import '../../utilities/utilities_cards.dart';
@@ -39,7 +39,7 @@ class AdminIngredientsTab extends StatelessWidget {
                 // Horizontal scrolling cards with fixed height
                 Container(
                   height: 80,
-                  child: CategoryCards(),
+                  child: IngredientCategoryCards(),
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(12, 4, 0, 4),
@@ -59,7 +59,7 @@ class AdminIngredientsTab extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context, 
-                    MaterialPageRoute(builder: (context) => AddFoodTemplate())
+                    MaterialPageRoute(builder: (context) => AddIngredientTemplate())
                   );
                 },
               ),

@@ -18,9 +18,37 @@ class FAButton extends StatelessWidget {
   }
 }
 
-class AddRemoveButton extends StatelessWidget {
-  const AddRemoveButton({super.key,});
-  
+class AddRemoveButton extends StatefulWidget {
+  final int initialValue;
+  final Function(int) onChanged;
+
+  const AddRemoveButton({super.key, this.initialValue = 1, required this.onChanged});
+
+  @override
+  State<AddRemoveButton> createState() => _AddRemoveButtonState();
+}
+
+class _AddRemoveButtonState extends State<AddRemoveButton> {
+  late int _quantity;
+
+  @override
+  void initState() {
+    super.initState();
+    _quantity = widget.initialValue;
+  }
+
+  void _increment() {
+    setState(() => _quantity++);
+    widget.onChanged(_quantity);
+  }
+
+  void _decrement() {
+    if (_quantity > 1) {
+      setState(() => _quantity--);
+      widget.onChanged(_quantity);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -36,7 +64,7 @@ class AddRemoveButton extends StatelessWidget {
           width: quantityBoxSize,
           height: quantityBoxSize,
           child: IconButton.filled(
-            onPressed: () {},
+            onPressed: _decrement,
             icon: const Icon(Icons.remove),
             iconSize: iconButtonSize,
             style: ButtonStyle(
@@ -64,7 +92,7 @@ class AddRemoveButton extends StatelessWidget {
             border: Border.all(color: c_pri_yellow),
           ),
           child: Text(
-            '00',
+            '$_quantity',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: subtitleFontSize),
           ),
@@ -75,7 +103,7 @@ class AddRemoveButton extends StatelessWidget {
           width: quantityBoxSize,
           height: quantityBoxSize,
           child: IconButton.filled(
-            onPressed: () {},
+            onPressed: _increment,
             icon: const Icon(Icons.add),
             iconSize: iconButtonSize,
             style: ButtonStyle(
