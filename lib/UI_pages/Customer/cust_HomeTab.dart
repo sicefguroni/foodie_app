@@ -64,7 +64,7 @@ class CustomerHomeTab extends StatelessWidget {
             // Horizontal scrolling cards with fixed height
             Container(
               height: 80,
-              child: CategoryCards(),
+              child: FoodCategoryCards(),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 4, 0, 4),
@@ -72,7 +72,7 @@ class CustomerHomeTab extends StatelessWidget {
             ),
             // Vertical scrolling grid that takes remaining space
             Expanded(
-              child: AdminFoodCards(),
+              child: CustomerFoodCards(),
             ),
           ],
         ),

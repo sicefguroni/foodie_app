@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:foodie_app/UI_pages/Templates/ad_food_Order.dart';
 import 'package:foodie_app/utilities/color_palette.dart';
 import 'package:foodie_app/utilities/utilities_buttons.dart';
 import 'utilities_others.dart';
-import '../UI_pages/Templates/food_Order.dart';
+import '../UI_pages/Templates/cust_food_Order.dart';
+
 
 // SAMPLE CARD INPUTS
 // SAMPLE CARD INPUTS
@@ -27,10 +29,9 @@ class Category {
   Category({required this.assetName, required this.name, required this.status, required this.detail, this.isSelected = false});
 }
 
-
-// FOUND IN ad_IngredientsTab && ad_FoodTab && cust_HomeTab
-// FOUND IN ad_IngredientsTab && ad_FoodTab && cust_HomeTab
-class CategoryCards extends StatelessWidget {
+// FOUND IN ad_IngredientsTab 
+// FOUND IN ad_IngredientsTab 
+class IngredientCategoryCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -40,26 +41,99 @@ class CategoryCards extends StatelessWidget {
       itemBuilder: (context, index) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: CategoryCard(category: _categories[index]),
+          child: IngredientCategoryCard(category: _categories[index]),
         );
       },
     );
   }
 }
 
-class CategoryCard extends StatefulWidget {
+class IngredientCategoryCard extends StatefulWidget {
   final Category category;
 
-  const CategoryCard({
+  const IngredientCategoryCard({
     required this.category, 
     Key? key,
   }) : super(key: key);
   
   @override
-  State<CategoryCard> createState() => _CategoryCardState();
+  State<IngredientCategoryCard> createState() => _IngredientCategoryCardState();
 }
 
-class _CategoryCardState extends State<CategoryCard> {
+class _IngredientCategoryCardState extends State<IngredientCategoryCard> {
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: () {},
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Image container
+          Card(
+            elevation: 1,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: SizedBox(
+              width: 50,
+              height: 50,
+              child: Image.asset(
+                widget.category.assetName,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          // Name text below the container
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              widget.category.name,
+              style: const TextStyle(fontFamily: 'Inter', fontSize: 10),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+// FOUND IN ad_IngredientsTab && ad_FoodTab && cust_HomeTab
+// FOUND IN ad_IngredientsTab && ad_FoodTab && cust_HomeTab
+class FoodCategoryCards extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: _categories.length,
+      padding: EdgeInsets.symmetric(horizontal: 8),
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: FoodCategoryCard(category: _categories[index]),
+        );
+      },
+    );
+  }
+}
+
+class FoodCategoryCard extends StatefulWidget {
+  final Category category;
+
+  const FoodCategoryCard({
+    required this.category, 
+    Key? key,
+  }) : super(key: key);
+  
+  @override
+  State<FoodCategoryCard> createState() => _FoodCategoryCardState();
+}
+
+class _FoodCategoryCardState extends State<FoodCategoryCard> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -186,7 +260,7 @@ class _AdminIngredientCardState extends State<AdminIngredientCard> {
           ),
           Padding(
             padding: EdgeInsets.fromLTRB(0, 0, 8, 0), // Add the required padding
-            child: AddRemoveButton(),
+            child: AddRemoveButton(onChanged: (int ) {  },),
           ),
         ],
       ),
@@ -243,7 +317,88 @@ class _AdminFoodCardState extends State<AdminFoodCard> {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => FoodTemplate())
+            MaterialPageRoute(builder: (context) => AdminFoodTemplate())
+          );
+        },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: Image.asset(widget.category.assetName, fit: BoxFit.cover),
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(8, 4, 0, 4),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                     Text(
+                      widget.category.name,
+                      style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: titleFontSize),
+                    ),
+                    Text(
+                      widget.category.status,
+                      style: TextStyle(fontFamily: 'Inter', fontSize: subtitleFontSize),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
+      ),
+    );
+  }
+}
+
+
+// FOUND IN cust_HomeTab
+// FOUND IN cust_HomeTab
+class CustomerFoodCards extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: .9,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+      ),
+      padding: EdgeInsets.all(8),
+      itemCount: _categories.length,
+      itemBuilder: (context, index) {
+        return AdminFoodCard(category: _categories[index]);
+      },
+    );
+  }
+}
+
+class CustomerFoodCard extends StatefulWidget {
+  final Category category;
+
+  const CustomerFoodCard({
+    required this.category, 
+    Key? key,
+  }) : super(key: key);
+  
+  @override
+  State<CustomerFoodCard> createState() => _CustomerFoodCardState();
+}
+
+class _CustomerFoodCardState extends State<CustomerFoodCard> {
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double titleFontSize = screenWidth * 0.04;
+    double subtitleFontSize = screenWidth * 0.04;
+
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CustomerFoodTemplate())
           );
         },
           child: Column(
@@ -581,7 +736,7 @@ class _CartCardState extends State<CartCard> {
                 Checkbox(value: widget.category.isSelected, onChanged: (_) => toggleSelection()),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 0, 8, 4),
-                  child: AddRemoveButton(),
+                  child: AddRemoveButton(onChanged: (int ) {  },),
                 ),
               ],
             ),

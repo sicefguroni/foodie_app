@@ -1,7 +1,175 @@
+import 'dart:io';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:foodie_app/utilities/utilities_buttons.dart';
 import 'utilities_texts.dart';
 import 'utilities_cards.dart';
 import 'package:foodie_app/utilities/color_palette.dart';
+import 'package:image_picker/image_picker.dart';
+
+class IngredientsInputSection extends StatefulWidget {
+  const IngredientsInputSection({super.key});
+
+  @override
+  State<IngredientsInputSection> createState() => _IngredientsInputSectionState();
+}
+
+class _IngredientsInputSectionState extends State<IngredientsInputSection> {
+  List<TextEditingController> _ingredientControllers = [];
+
+  void _addIngredientField() {
+    setState(() {
+      _ingredientControllers.add(TextEditingController());
+    });
+  }
+
+  @override
+  void dispose() {
+    for (var controller in _ingredientControllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          bodyText(text: 'Ingredients', color: c_pri_yellow),
+          ..._ingredientControllers.map((controller) => Padding(
+            padding: EdgeInsets.only(bottom: 4),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: TextField(
+                    controller: controller,
+                    decoration: InputDecoration(
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: c_sec_yellow),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: c_pri_yellow),
+                      )
+                    ),
+                  ),
+                ),
+                SizedBox(width: 40),
+                Expanded(
+                  flex: 1,
+                  child: AddRemoveButton(onChanged: (int ) {  },)),
+              ],
+            ),
+            ),
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: IconButton(
+              onPressed: _addIngredientField,
+              icon: Icon(Icons.add),
+              iconSize: 16,
+              color: c_pri_yellow,
+              constraints: BoxConstraints(maxHeight: 32, maxWidth: 32),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+final List<DropdownCategory> _dropdownCategories = [
+  DropdownCategory(categoryName: 'Pending'),
+  DropdownCategory(categoryName: 'Accepted'),
+  DropdownCategory(categoryName: 'Preparing '),
+  DropdownCategory(categoryName: 'Completed'),
+  DropdownCategory(categoryName: 'Cancelled'),
+];
+
+class DropdownCategory {
+  final String categoryName;
+  
+  DropdownCategory({required this.categoryName});
+}
+
+class DropdownMenuCategories extends StatefulWidget {
+  const DropdownMenuCategories({super.key});
+
+  @override
+  State<DropdownMenuCategories> createState() => _DropdownMenuCategoriesState();
+}
+
+class _DropdownMenuCategoriesState extends State<DropdownMenuCategories> {
+  @override
+  Widget build(BuildContext context) {
+    return DropdownMenu<DropdownCategory>(
+          dropdownMenuEntries: _dropdownCategories.map((category) {
+            return DropdownMenuEntry<DropdownCategory>(
+              value: category,
+              label: category.categoryName,
+              style: ButtonStyle(
+                maximumSize: WidgetStatePropertyAll(Size(double.infinity, double.infinity))
+              )
+            );
+          }).toList(),
+        );
+  }
+}
+
+class ImageUploader extends StatefulWidget {
+  const ImageUploader({super.key});
+
+  @override
+  State<ImageUploader> createState() => _ImageUploaderState();
+}
+
+class _ImageUploaderState extends State<ImageUploader> {
+  File? _image;
+
+  Future<void> _pickImage(dynamic ImageSource) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _pickImage(ImageSource.gallery),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        width: double.infinity,
+        child: DottedBorder(
+          color: c_pri_yellow,
+          dashPattern: const [6, 3],
+          borderType: BorderType.RRect,
+          radius: const Radius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 40), // add spacing
+            alignment: Alignment.center, // ensure the container centers content
+            child: Column(
+              mainAxisSize: MainAxisSize.min, // hug content vertically
+              mainAxisAlignment: MainAxisAlignment.center, // center vertically
+              crossAxisAlignment: CrossAxisAlignment.center, // center horizontally
+              children: [
+                Icon(Icons.image, size: 32, color: c_pri_yellow),
+                bodyText(text: 'Upload Image', color: c_pri_yellow),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class TitlewithImage extends StatelessWidget {
   final String title;
