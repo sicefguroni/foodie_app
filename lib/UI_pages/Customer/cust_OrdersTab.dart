@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:foodie_app/utilities/color_palette.dart';
+import 'package:foodie_app/Utilities/color_palette.dart';
 import 'package:foodie_app/UI_pages/Templates/account_Profile.dart';
 import 'cust_Cart.dart';
-import '../../utilities/utilities_buttons.dart';
-import '../../utilities/utilities_others.dart';
+import '../../Utilities/utilities_buttons.dart';
+import '../../Utilities/utilities_others.dart';
 
 class CustomerOrdersTab extends StatelessWidget {
   @override

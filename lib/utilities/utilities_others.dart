@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
-import 'package:foodie_app/utilities/utilities_buttons.dart';
+import 'package:foodie_app/Utilities/utilities_buttons.dart';
 import 'utilities_texts.dart';
 import 'utilities_cards.dart';
-import 'package:foodie_app/utilities/color_palette.dart';
+import 'package:foodie_app/Utilities/color_palette.dart';
 import 'package:image_picker/image_picker.dart';
 
 class IngredientsInputSection extends StatefulWidget {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foodie_app/utilities/color_palette.dart';
+import 'package:foodie_app/Utilities/color_palette.dart';
 
 class FAButton extends StatelessWidget {
   const FAButton({super.key, required this.onPressed});
@@ -8,7 +8,7 @@ class FAButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton(
+    return FloatingActionButton.small(
       onPressed: onPressed,
       elevation: 2,
       backgroundColor: c_pri_yellow,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../utilities/utilities_buttons.dart';
-import '../utilities/utilities_texts.dart';
+import '../Utilities/utilities_buttons.dart';
+import '../Utilities/utilities_texts.dart';
 import '../UI_pages/Opening/Second_Route.dart';
 
 const Color c_green = Color(0xFF00695C);

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:foodie_app/utilities/color_palette.dart';
-import '../../utilities/utilities_buttons.dart';
-import '../../utilities/utilities_others.dart';
-import '../../utilities/utilities_texts.dart';
+import 'package:foodie_app/Utilities/color_palette.dart';
+import '../../Utilities/utilities_buttons.dart';
+import '../../Utilities/utilities_others.dart';
+import '../../Utilities/utilities_texts.dart';
 import '../Opening/Second_Route.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -108,6 +108,29 @@ class ProfilePage extends StatelessWidget {
                               TextField(
                                 readOnly: true,
                                 controller: TextEditingController(text: '0922'),
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(color: c_sec_yellow),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(color: c_pri_yellow),
+                                  )
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(16, 4, 16, 4),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              bodyText(text: 'Address', color: c_pri_yellow),
+                              SizedBox(height: 4),
+                              TextField(
+                                readOnly: true,
+                                controller: TextEditingController(text: 'UP Cebu'),
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(),
                                   enabledBorder: OutlineInputBorder(

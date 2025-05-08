@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foodie_app/utilities/color_palette.dart';
+import 'package:foodie_app/Utilities/color_palette.dart';
 import 'cust_HomeTab.dart';
 import 'cust_OrdersTab.dart';
 

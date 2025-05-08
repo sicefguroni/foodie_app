@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foodie_app/utilities/color_palette.dart';
+import 'package:foodie_app/Utilities/color_palette.dart';
 import 'ad_FoodTab.dart';
 import 'ad_IngredientsTab.dart';
 import 'ad_OrdersTab.dart';

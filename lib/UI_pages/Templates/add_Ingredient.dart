@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:foodie_app/utilities/color_palette.dart';
-import 'package:foodie_app/utilities/utilities_others.dart';
-import 'package:foodie_app/utilities/utilities_texts.dart';
+import 'package:foodie_app/Utilities/color_palette.dart';
+import 'package:foodie_app/Utilities/utilities_others.dart';
+import 'package:foodie_app/Utilities/utilities_texts.dart';
 import 'package:dotted_border/dotted_border.dart';
-import '../../utilities/utilities_buttons.dart';
+import '../../Utilities/utilities_buttons.dart';
 
 class AddIngredientTemplate extends StatelessWidget {
   @override

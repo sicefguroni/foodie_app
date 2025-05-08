@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:foodie_app/utilities/color_palette.dart';
-import '../../utilities/utilities_buttons.dart';
-import '../../utilities/utilities_texts.dart';
-import '../../utilities/utilities_cards.dart';
+import 'package:foodie_app/Utilities/color_palette.dart';
+import '../../Utilities/utilities_buttons.dart';
+import '../../Utilities/utilities_texts.dart';
+import '../../Utilities/utilities_cards.dart';
 
 class AdminFoodTemplate extends StatelessWidget {
   @override

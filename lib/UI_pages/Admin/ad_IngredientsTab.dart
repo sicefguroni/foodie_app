@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:foodie_app/UI_pages/Templates/add_Ingredient.dart';
-import 'package:foodie_app/utilities/color_palette.dart';
+import 'package:foodie_app/Utilities/color_palette.dart';
 import 'package:foodie_app/UI_pages/Templates/account_Profile.dart';
-import '../../utilities/utilities_cards.dart';
-import '../../utilities/utilities_buttons.dart';
+import '../../Utilities/utilities_cards.dart';
+import '../../Utilities/utilities_buttons.dart';
 
 class AdminIngredientsTab extends StatelessWidget {
   @override
@@ -43,7 +43,7 @@ class AdminIngredientsTab extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(12, 4, 0, 4),
-                  child: Text('All Ingredients', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  child: Text('Ingredients Available', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
                 // Vertical scrolling grid that takes remaining space
                 Expanded(

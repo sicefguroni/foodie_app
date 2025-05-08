@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:foodie_app/utilities/color_palette.dart';
-import '../../utilities/utilities_buttons.dart';
-import '../../utilities/utilities_others.dart';
+import 'package:foodie_app/Utilities/color_palette.dart';
+import '../../Utilities/utilities_buttons.dart';
+import '../../Utilities/utilities_others.dart';
 import '../Customer/Customer_Page.dart';
 import '../Admin/Admin_Page.dart';
 

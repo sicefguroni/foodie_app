@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:foodie_app/utilities/color_palette.dart';
-import 'package:foodie_app/utilities/utilities_cards.dart';
-import 'package:foodie_app/utilities/utilities_texts.dart';
+import 'package:foodie_app/Utilities/color_palette.dart';
+import 'package:foodie_app/Utilities/utilities_cards.dart';
+import 'package:foodie_app/Utilities/utilities_texts.dart';
 import 'cust_Checkout.dart';
-import '../../utilities/utilities_buttons.dart';
+import '../../Utilities/utilities_buttons.dart';
 
 class CustomerCartPage extends StatelessWidget {
   @override
