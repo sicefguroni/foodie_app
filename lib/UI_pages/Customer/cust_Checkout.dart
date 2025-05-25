@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:foodie_app/Utilities/color_palette.dart';
 import 'package:foodie_app/Utilities/utilities_cards.dart';
 import 'package:foodie_app/Utilities/utilities_texts.dart';
+import '../OpenStreetMap.dart';
 import '../../Utilities/utilities_buttons.dart';
 
 class CustomerCheckoutPage extends StatelessWidget {
@@ -12,46 +13,61 @@ class CustomerCheckoutPage extends StatelessWidget {
         child: Column(
           children: [
             TitleSectionButton(
-              leftmost: YellowBackButton(), 
-              left: Heading4_Text(text: 'Checkout', color: c_pri_yellow)),
+                leftmost: YellowBackButton(),
+                left: Heading4_Text(text: 'Checkout', color: c_pri_yellow)),
             Padding(
               padding: EdgeInsets.fromLTRB(8, 0, 8, 8),
               child: Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
                 elevation: 1,
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: c_pri_yellow,
+                child: Material(
+                  color: c_pri_yellow,
+                  borderRadius: BorderRadius.circular(8),
+                  child: InkWell(
                     borderRadius: BorderRadius.circular(8),
-                  ),
-                  padding: EdgeInsets.all(8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Deliver to:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: c_white),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => OpenstreetmapScreen())
+                      );
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Deliver to:',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: c_white),
+                          ),
+                          Text(
+                            'Ceferino Jumao-as V',
+                            style: TextStyle(fontSize: 12, color: c_white),
+                          ),
+                          Text(
+                            'UP Cebu, Lahug, Gorordo',
+                            style: TextStyle(fontSize: 10, color: c_white),
+                          ),
+                        ],
                       ),
-                      Text(
-                        'Ceferino Jumao-as V', style: TextStyle(fontSize: 12, color: c_white),
-                      ),
-                      Text(
-                        'UP Cebu, Lahug, Gorordo', style: TextStyle(fontSize: 10, color: c_white),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
-            Expanded(
-              child: CheckoutCards()
-            ),
+            Expanded(child: CheckoutCards()),
             Padding(
-              padding: EdgeInsets.fromLTRB(8, 8, 8,16),
+              padding: EdgeInsets.fromLTRB(8, 8, 8, 16),
               child: Column(
                 children: [
                   Card(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
                     elevation: 1,
                     child: Container(
                       padding: EdgeInsets.all(8),
@@ -64,12 +80,15 @@ class CustomerCheckoutPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: 8), 
-                  ActionButton(buttonName: 'Place Order', backgroundColor: c_pri_yellow, 
-                    onPressed: () { 
-                      Navigator.push(context, 
-                        MaterialPageRoute(builder: (context) => CustomerCheckoutPage())
-                      );
+                  SizedBox(height: 8),
+                  ActionButton(
+                    buttonName: 'Place Order',
+                    backgroundColor: c_pri_yellow,
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CustomerCheckoutPage()));
                     },
                   ),
                 ],

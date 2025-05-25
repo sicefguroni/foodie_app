@@ -8,7 +8,11 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setWindowFrame(Rect.fromLTWH(0, 75, 360, 800));
 
-  await dotenv.load();
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    print("⚠️ Failed to load .env: $e");
+  }
 
   await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
