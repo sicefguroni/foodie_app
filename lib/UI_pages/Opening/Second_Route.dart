@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:foodie_app/UI_pages/Opening/AdminSignIn_Route.dart';
+import 'package:foodie_app/UI_pages/Opening/SignIn_Route.dart';
 import 'package:foodie_app/Utilities/color_palette.dart';
 import '../../Utilities/utilities_buttons.dart';
 import '../../Utilities/utilities_others.dart';
-import '../Customer/Customer_Page.dart';
-import '../Admin/Admin_Page.dart';
-
 
 class SecondRoute extends StatelessWidget {
   @override
@@ -32,7 +31,7 @@ class SecondRoute extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => CustomerPage()),
+                      MaterialPageRoute(builder: (context) => SignInRoute()),
                     );
                   },
                 ),
@@ -44,7 +43,7 @@ class SecondRoute extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => AdminPage()),
+                      MaterialPageRoute(builder: (context) => AdminSignInRoute()),
                     );
                   },
                 ),

@@ -107,5 +107,6 @@ flutter:
     - lib/images/white-back-button.png
     - lib/images/yellow-back-button.png
     - lib/images/
+    - .env
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package

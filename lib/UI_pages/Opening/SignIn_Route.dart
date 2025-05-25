@@ -4,7 +4,6 @@ import 'package:foodie_app/UI_pages/Opening/SignUp_Route.dart';
 import 'package:foodie_app/Utilities/color_palette.dart';
 import '../../Utilities/utilities_buttons.dart';
 import '../../Utilities/utilities_texts.dart';
-import '../Admin/Admin_Page.dart';
 import '../../auth/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
