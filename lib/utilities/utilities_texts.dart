@@ -1,21 +1,29 @@
 import 'package:flutter/material.dart';
 
 class InputTextField extends StatelessWidget {
-  const InputTextField({super.key, required this.hintText});
+  const InputTextField({
+    super.key,
+    required this.hintText,
+    this.controller,
+    this.obscureText = false,
+  });
 
   final String hintText;
+  final TextEditingController? controller;
+  final bool obscureText;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: controller,
+      obscureText: obscureText,
       decoration: InputDecoration(
         hintText: hintText,
         border: OutlineInputBorder(),
-      )
+      ),
     );
   }
 }
-
 class TitleText extends StatelessWidget {
   const TitleText({super.key, required this.title, required this.color});
 
