@@ -34,13 +34,21 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  supabase_flutter: ^2.0.0
+  supabase_flutter: ^2.9.0
   window_size: ^0.1.0
   device_frame: ^1.2.0
   dotted_border: ^2.0.0
   numberpicker: ^2.1.1
   image_picker: ^1.1.2
   flutter_dotenv: ^5.1.0
+  # For OpenStreetMap
+  latlong2: ^0.9.1
+  flutter_map: ^7.0.2
+  flutter_map_location_marker: ^9.1.0
+  geolocator: 13.0.4
+  permission_handler: ^10.4.3
+  http: ^1.3.0
+  flutter_polyline_points: ^2.1.0
 
 dev_dependencies:
   flutter_test:
@@ -107,5 +115,6 @@ flutter:
     - lib/images/white-back-button.png
     - lib/images/yellow-back-button.png
     - lib/images/
+    - .env
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
