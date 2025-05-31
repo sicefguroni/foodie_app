@@ -18,7 +18,7 @@ class AddFoodTemplate extends StatelessWidget {
               left: Heading4_Text(text: 'Add Food', color: c_pri_yellow)
             ),
             SizedBox(height: 8),
-            ImageUploader(),
+            //ImageUploader(),
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.all(16),
@@ -80,7 +80,7 @@ class AddFoodTemplate extends StatelessWidget {
                                 children: [
                                   bodyText(text: 'Category', color: c_pri_yellow),
                                   SizedBox(height: 4),
-                                  DropdownMenuCategories(),
+                                  //DropdownMenuCategories(),
                                 ],
                               ),
                             ),

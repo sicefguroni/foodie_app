@@ -22,7 +22,7 @@ class AddRemoveButton extends StatefulWidget {
   final int initialValue;
   final Function(int) onChanged;
 
-  const AddRemoveButton({super.key, this.initialValue = 1, required this.onChanged});
+  const AddRemoveButton({super.key, this.initialValue = 0, required this.onChanged});
 
   @override
   State<AddRemoveButton> createState() => _AddRemoveButtonState();
@@ -37,13 +37,22 @@ class _AddRemoveButtonState extends State<AddRemoveButton> {
     _quantity = widget.initialValue;
   }
 
+  @override
+  void didUpdateWidget(AddRemoveButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Update the internal quantity when the widget is rebuilt with new initial value
+    if (oldWidget.initialValue != widget.initialValue) {
+      _quantity = widget.initialValue;
+    }
+  }
+
   void _increment() {
     setState(() => _quantity++);
     widget.onChanged(_quantity);
   }
 
   void _decrement() {
-    if (_quantity > 1) {
+    if (_quantity > 0) {
       setState(() => _quantity--);
       widget.onChanged(_quantity);
     }

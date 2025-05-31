@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:foodie_app/UI_pages/Customer/Customer_Page.dart';
-import 'package:foodie_app/UI_pages/Opening/SignUp_Route.dart';
+import 'package:foodie_app/UI_pages/Opening/CustomerSignUp_Route.dart';
 import 'package:foodie_app/Utilities/color_palette.dart';
 import '../../Utilities/utilities_buttons.dart';
 import '../../Utilities/utilities_texts.dart';
 import '../../auth/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class SignInRoute extends StatefulWidget {
-  const SignInRoute({super.key});
+class CustomerSignInRoute extends StatefulWidget {
+  const CustomerSignInRoute({super.key});
 
   @override
-  State<SignInRoute> createState() => _SignInRouteState();
+  State<CustomerSignInRoute> createState() => _CustomerSignInRouteState();
 }
 
-class _SignInRouteState extends State<SignInRoute> {
+class _CustomerSignInRouteState extends State<CustomerSignInRoute> {
   // get auth service
   final authService = AuthService();
 

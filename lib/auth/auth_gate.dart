@@ -8,7 +8,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../UI_pages/Opening/SignIn_Route.dart';
+import '../UI_pages/Opening/CustomerSignIn_Route.dart';
 import '../UI_pages/Customer/Customer_Page.dart';
 
 class AuthGate extends StatelessWidget {
@@ -33,7 +33,7 @@ class AuthGate extends StatelessWidget {
 
         if (session != null) {
           return const CustomerPage();
-        } else return SignInRoute();
+        } else return CustomerSignInRoute();
       }
     );
   }
