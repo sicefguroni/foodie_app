@@ -3,7 +3,10 @@ import 'package:foodie_app/UI_pages/Templates/ad_food_Order.dart';
 import 'package:foodie_app/Utilities/color_palette.dart';
 import 'package:foodie_app/Utilities/utilities_buttons.dart';
 import 'utilities_others.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../UI_pages/Templates/cust_food_Order.dart';
+import '../UI_pages/Schemas/Ingredient.dart';
+import '../UI_pages/Templates/Ingredient_Form.dart';
 
 
 // SAMPLE CARD INPUTS
@@ -177,42 +180,136 @@ class _FoodCategoryCardState extends State<FoodCategoryCard> {
 
 // FOUND IN ad_IngredientsTab
 // FOUND IN ad_IngredientsTab
-class AdminIngredientCards extends StatelessWidget {
+// Updated AdminIngredientCards with proper error handling
+class AdminIngredientCards extends StatefulWidget {
+  @override
+  State<AdminIngredientCards> createState() => _AdminIngredientCardsState();
+}
+
+class _AdminIngredientCardsState extends State<AdminIngredientCards> {
+  List<Ingredient> ingredients = [];
+  bool isLoading = true;
+  RealtimeChannel? _channel;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchIngredients();
+    setupRealtimeListener();
+  }
+
+  @override
+  void dispose() {
+    // Clean up the subscription when widget is disposed
+    _channel?.unsubscribe();
+    super.dispose();
+  }
+
+  Future<void> fetchIngredients() async {
+    try {
+      final response = await Supabase.instance.client
+          .from('ingredients')
+          .select('*')
+          .order('name', ascending: true);
+
+      print('Supabase response: $response');
+
+      setState(() {
+        ingredients = response.map<Ingredient>((json) => Ingredient.fromJson(json)).toList();
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error fetching ingredients: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void setupRealtimeListener() {
+    _channel = Supabase.instance.client
+      .channel('public:ingredients')
+      .onPostgresChanges(
+        event: PostgresChangeEvent.all, 
+        schema: 'public',
+        table: 'ingredients',
+        callback: (payload) {
+          fetchIngredients();
+        })
+      .subscribe();
+  }
+
+  void updateIngredientQuantity(String ingredientId, int newQuantity) {
+    final index = ingredients.indexWhere((ingredient) => 
+        ingredient.id.toString() == ingredientId);
+    if (index != -1) {
+      setState(() {
+        ingredients[index].quantity = newQuantity;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 1,
-      childAspectRatio: 3.5,
-      mainAxisSpacing: 2,
-      ), 
-      padding: EdgeInsets.all(8),
-      itemCount: _categories.length,
-      itemBuilder: (context, index) {
-        return AdminIngredientCard(category: _categories[index]);
-      }
+    if (isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
+    return Column(
+      children: [
+        // Main ingredients list
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: fetchIngredients,
+            child: GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 1,
+                childAspectRatio: 3.5,
+                mainAxisSpacing: 2,
+              ),
+              padding: EdgeInsets.all(8),
+              itemCount: ingredients.length,
+              itemBuilder: (context, index) {
+                return InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () {
+                    Navigator.push(context, 
+                      MaterialPageRoute(builder: (_) => EditIngredientTemplate(ingredient: ingredients[index]))
+                    );
+                  },
+                  child: AdminIngredientCard(
+                    key: ValueKey(ingredients[index].id),
+                    ingredient: ingredients[index],
+                    onQuantityChanged: updateIngredientQuantity,
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
-
-class AdminIngredientCard extends StatefulWidget {
-  final Category category;
+// Updated AdminIngredientCard with better error handling
+class AdminIngredientCard extends StatelessWidget {
+  final Ingredient ingredient;
+  final Function(String, int) onQuantityChanged;
 
   const AdminIngredientCard({
-    required this.category, 
-    Key? key,
+    required this.ingredient, 
+    required this.onQuantityChanged,
+    Key? key
   }) : super(key: key);
-   
-  @override
-  State<AdminIngredientCard> createState() => _AdminIngredientCardState();
-}
 
-class _AdminIngredientCardState extends State<AdminIngredientCard> {
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     double imageWidth = screenWidth * 0.2;
+    double imageHeight = screenHeight * 0.2;
     double titleFontSize = screenWidth * 0.045;
     double subtitleFontSize = screenWidth * 0.04;
+    double iconButtonSize = screenWidth * 0.07;
 
     return Card(
       elevation: 1,
@@ -221,8 +318,8 @@ class _AdminIngredientCardState extends State<AdminIngredientCard> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Padding(
-            padding: EdgeInsets.fromLTRB(4, 2, 0, 2), // Add the required padding
-            child: Row(// Image container
+            padding: EdgeInsets.fromLTRB(4, 2, 0, 2),
+            child: Row(
               children: [
                 Card(
                   shape: RoundedRectangleBorder(
@@ -230,14 +327,20 @@ class _AdminIngredientCardState extends State<AdminIngredientCard> {
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: SizedBox(
+                    height: imageHeight,
                     width: imageWidth,
-                    child: Image.asset(
-                      widget.category.assetName,
+                    child: Image.network(
+                      ingredient.imageUrl ?? '',
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey[300],
+                          child: Icon(Icons.image_not_supported),
+                        );
+                      },
                     ),
                   ),
                 ),
-                // Name text below the container
                 Padding(
                   padding: const EdgeInsets.fromLTRB(4, 4, 0, 0),
                   child: Column(
@@ -245,11 +348,11 @@ class _AdminIngredientCardState extends State<AdminIngredientCard> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        widget.category.name,
+                        ingredient.name,
                         style: TextStyle(fontFamily: 'Inter', fontSize: titleFontSize),
                       ),
                       Text(
-                        widget.category.detail,
+                        ingredient.unit,
                         style: TextStyle(fontFamily: 'Inter', fontSize: subtitleFontSize),
                       ),
                     ],
@@ -258,16 +361,57 @@ class _AdminIngredientCardState extends State<AdminIngredientCard> {
               ],
             ),
           ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(0, 0, 8, 0), // Add the required padding
-            child: AddRemoveButton(onChanged: (int ) {  },),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
+                child: AddRemoveButton(
+                  initialValue: ingredient.quantity,
+                  onChanged: (quantity) async {
+                    try {
+                      await Supabase.instance.client
+                          .from('ingredients')
+                          .update({'quantity': quantity})
+                          .eq('id', ingredient.id)
+                          .select();
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Failed to update ${ingredient.name}: ${e.toString()}')),
+                      );
+                    }
+                  },
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
+                child: IconButton(
+                  icon: Icon(Icons.delete, size: iconButtonSize),
+                  padding: EdgeInsets.zero,
+                  visualDensity: VisualDensity.compact,
+                  color: c_pri_yellow,
+                  onPressed: () async {
+                    try {
+                      await Supabase.instance.client
+                          .from('ingredients')
+                          .delete()
+                          .eq('id', ingredient.id);
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Failed to delete ${ingredient.name}: ${e.toString()}')),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
-} 
-
+}
 
 // FOUND IN ad_FoodTab
 // FOUND IN ad_FoodTab
