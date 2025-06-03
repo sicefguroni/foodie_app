@@ -6,8 +6,9 @@ import 'utilities_others.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../UI_pages/Templates/cust_food_Order.dart';
 import '../UI_pages/Schemas/Ingredient.dart';
-import '../UI_pages/Templates/Ingredient_Form.dart';
-
+import '../UI_pages/Schemas/Food.dart';
+import '../UI_pages/Templates/AddIngredient_Form.dart';
+import '../UI_pages/Templates/AddFood_Form.dart';
 
 // SAMPLE CARD INPUTS
 // SAMPLE CARD INPUTS
@@ -415,9 +416,68 @@ class AdminIngredientCard extends StatelessWidget {
 
 // FOUND IN ad_FoodTab
 // FOUND IN ad_FoodTab
-class AdminFoodCards extends StatelessWidget {
+class AdminFoodCards extends StatefulWidget {
+  @override
+  State<AdminFoodCards> createState() => _AdminFoodCardsState();
+}
+
+class _AdminFoodCardsState extends State<AdminFoodCards> {
+  List<Food> foods = [];
+  bool isLoading = true;
+  RealtimeChannel? _channel;
+
+  @override 
+  void initState() {
+    super.initState();
+    fetchFoods();
+    setupRealtimeListener();
+  }
+
+  @override
+  void dispose() {
+    _channel?.unsubscribe();
+    super.dispose();
+  }
+
+  Future<void> fetchFoods() async {
+    try {
+      final response = await Supabase.instance.client
+        .from('products')
+        .select('*')
+        .order('product_name', ascending: true);
+
+      print('Supabase response: $response');
+
+      setState(() {
+        foods = response.map<Food>((json) => Food.fromJson(json)).toList();
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error fetching food: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void setupRealtimeListener() {
+    _channel = Supabase.instance.client
+      .channel('public:products')
+      .onPostgresChanges(
+        event: PostgresChangeEvent.all, 
+        schema: 'public',
+        table: 'products',
+        callback: (payload) {
+          fetchFoods();
+        })
+      .subscribe();
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
     return GridView.builder(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
@@ -426,153 +486,167 @@ class AdminFoodCards extends StatelessWidget {
         mainAxisSpacing: 8,
       ),
       padding: EdgeInsets.all(8),
-      itemCount: _categories.length,
+      itemCount: foods.length,
       itemBuilder: (context, index) {
-        return AdminFoodCard(category: _categories[index]);
+        return InkWell(
+          onTap: () {
+            Navigator.push(context, 
+              MaterialPageRoute(builder: (_) => EditFoodTemplate(food: foods[index]))
+            );
+          },
+          child: AdminFoodCard(
+            key: ValueKey(foods[index].id),
+            food: foods[index]
+          )
+        );
       },
     );
   }
 }
 
-class AdminFoodCard extends StatefulWidget {
-  final Category category;
+class AdminFoodCard extends StatelessWidget {
+  final Food food;
 
   const AdminFoodCard({
-    required this.category, 
+    required this.food, 
     Key? key,
   }) : super(key: key);
   
   @override
-  State<AdminFoodCard> createState() => _AdminFoodCardState();
-}
-
-class _AdminFoodCardState extends State<AdminFoodCard> {
-  @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
+    double imageHeight = screenHeight * 0.13;
     double titleFontSize = screenWidth * 0.04;
     double subtitleFontSize = screenWidth * 0.04;
 
     return Card(
-      elevation: 2,
+      elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AdminFoodTemplate())
-          );
-        },
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: Image.asset(widget.category.assetName, fit: BoxFit.cover),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Card(
+            margin: EdgeInsets.all(4),
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadiusGeometry.circular(8),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: SizedBox(
+              height: imageHeight,
+              child: Image.network(
+                food.imageUrl ?? '', 
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.grey[300],
+                    child: Icon(Icons.image_not_supported),
+                  );
+                },
               ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(8, 4, 0, 4),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                     Text(
-                      widget.category.name,
-                      style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: titleFontSize),
-                    ),
-                    Text(
-                      widget.category.status,
-                      style: TextStyle(fontFamily: 'Inter', fontSize: subtitleFontSize),
-                    ),
-                  ],
-                ),
-              )
-            ],
+            ),
           ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(8, 4, 0, 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                 Text(
+                  food.product_name,
+                  style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: titleFontSize),
+                ),
+                Text(food.availability? 'Available' : 'Unavailable',
+                  style: TextStyle(fontFamily: 'Inter', fontSize: subtitleFontSize),
+                ),
+              ],
+            ),
+          )
+        ],
       ),
     );
   }
 }
 
-
 // FOUND IN cust_HomeTab
 // FOUND IN cust_HomeTab
-class CustomerFoodCards extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: .9,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-      ),
-      padding: EdgeInsets.all(8),
-      itemCount: _categories.length,
-      itemBuilder: (context, index) {
-        return AdminFoodCard(category: _categories[index]);
-      },
-    );
-  }
-}
+// class CustomerFoodCards extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return GridView.builder(
+//       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+//         crossAxisCount: 2,
+//         childAspectRatio: .9,
+//         crossAxisSpacing: 8,
+//         mainAxisSpacing: 8,
+//       ),
+//       padding: EdgeInsets.all(8),
+//       itemCount: _categories.length,
+//       itemBuilder: (context, index) {
+//         return AdminFoodCard(category: _categories[index]);
+//       },
+//     );
+//   }
+// }
 
-class CustomerFoodCard extends StatefulWidget {
-  final Category category;
+// class CustomerFoodCard extends StatefulWidget {
+//   final Category category;
 
-  const CustomerFoodCard({
-    required this.category, 
-    Key? key,
-  }) : super(key: key);
+//   const CustomerFoodCard({
+//     required this.category, 
+//     Key? key,
+//   }) : super(key: key);
   
-  @override
-  State<CustomerFoodCard> createState() => _CustomerFoodCardState();
-}
+//   @override
+//   State<CustomerFoodCard> createState() => _CustomerFoodCardState();
+// }
 
-class _CustomerFoodCardState extends State<CustomerFoodCard> {
-  @override
-  Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double titleFontSize = screenWidth * 0.04;
-    double subtitleFontSize = screenWidth * 0.04;
+// class _CustomerFoodCardState extends State<CustomerFoodCard> {
+//   @override
+//   Widget build(BuildContext context) {
+//     double screenWidth = MediaQuery.of(context).size.width;
+//     double titleFontSize = screenWidth * 0.04;
+//     double subtitleFontSize = screenWidth * 0.04;
 
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => CustomerFoodTemplate())
-          );
-        },
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: Image.asset(widget.category.assetName, fit: BoxFit.cover),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(8, 4, 0, 4),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                     Text(
-                      widget.category.name,
-                      style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: titleFontSize),
-                    ),
-                    Text(
-                      widget.category.status,
-                      style: TextStyle(fontFamily: 'Inter', fontSize: subtitleFontSize),
-                    ),
-                  ],
-                ),
-              )
-            ],
-          ),
-      ),
-    );
-  }
-}
+//     return Card(
+//       elevation: 2,
+//       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+//       child: InkWell(
+//         borderRadius: BorderRadius.circular(12),
+//         onTap: () {
+//           Navigator.push(
+//             context,
+//             MaterialPageRoute(builder: (context) => CustomerFoodTemplate())
+//           );
+//         },
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.stretch,
+//             children: [
+//               Expanded(
+//                 child: Image.asset(widget.category.assetName, fit: BoxFit.cover),
+//               ),
+//               Padding(
+//                 padding: EdgeInsets.fromLTRB(8, 4, 0, 4),
+//                 child: Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: [
+//                      Text(
+//                       widget.category.name,
+//                       style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: titleFontSize),
+//                     ),
+//                     Text(
+//                       widget.category.status,
+//                       style: TextStyle(fontFamily: 'Inter', fontSize: subtitleFontSize),
+//                     ),
+//                   ],
+//                 ),
+//               )
+//             ],
+//           ),
+//       ),
+//     );
+//   }
+// }
 
 
 // FOUND IN ad_OrdersTab
