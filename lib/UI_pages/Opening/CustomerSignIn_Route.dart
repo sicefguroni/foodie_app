@@ -63,14 +63,14 @@ class _CustomerSignInRouteState extends State<CustomerSignInRoute> {
           await authService.signOut();
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Access denied: not a customer')),
+              const SnackBar(content: Text('Access denied: Account is not a customer.')),
             );
           }
         }
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Login failed')),
+            const SnackBar(content: Text('Login failed. Account does not exist.')),
           );
         }
       }
