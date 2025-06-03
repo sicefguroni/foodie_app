@@ -71,9 +71,9 @@ class CustomerHomeTab extends StatelessWidget {
               child: Text('Picks for you', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             ),
             // Vertical scrolling grid that takes remaining space
-            Expanded(
-              child: CustomerFoodCards(),
-            ),
+            // Expanded(
+            //   child: CustomerFoodCards(),
+            // ),
           ],
         ),
       ),

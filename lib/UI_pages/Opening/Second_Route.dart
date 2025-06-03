@@ -33,7 +33,7 @@ class SecondRoute extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => CustomerSignInRoute()),
+                      MaterialPageRoute(builder: (context) => CustomerPage()),
                     );
                   },
                 ),
@@ -45,7 +45,7 @@ class SecondRoute extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => AdminSignInRoute()),
+                      MaterialPageRoute(builder: (context) => AdminPage()),
                     );
                   },
                 ),

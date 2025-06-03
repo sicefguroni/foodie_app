@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:foodie_app/UI_pages/Schemas/Ingredient.dart';
 import 'package:foodie_app/Utilities/utilities_buttons.dart';
 import 'utilities_texts.dart';
 import 'utilities_cards.dart';
@@ -8,86 +9,207 @@ import 'package:foodie_app/Utilities/color_palette.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class IngredientsInputSection extends StatefulWidget {
-  const IngredientsInputSection({super.key});
+class IngredientQuantityInput extends StatelessWidget {
+  final List<Ingredient> ingredientOptions;
+  final Ingredient? selectedIngredient;
+  final String? quantity;
+  final Function(Ingredient?) onIngredientChanged;
+  final Function(int) onQuantityChanged;
+  final VoidCallback onRemove;
 
-  @override
-  State<IngredientsInputSection> createState() => _IngredientsInputSectionState();
-}
-
-class _IngredientsInputSectionState extends State<IngredientsInputSection> {
-  List<TextEditingController> _ingredientControllers = [];
-
-  void _addIngredientField() {
-    setState(() {
-      _ingredientControllers.add(TextEditingController());
-    });
-  }
-
-  @override
-  void dispose() {
-    for (var controller in _ingredientControllers) {
-      controller.dispose();
-    }
-    super.dispose();
-  }
+  const IngredientQuantityInput({
+    super.key,
+    required this.ingredientOptions,
+    required this.selectedIngredient,
+    required this.quantity,
+    required this.onIngredientChanged,
+    required this.onQuantityChanged,
+    required this.onRemove,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          bodyText(text: 'Ingredients', color: c_pri_yellow),
-          ..._ingredientControllers.map((controller) => Padding(
-            padding: EdgeInsets.only(bottom: 4),
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: TextField(
-                    controller: controller,
-                    decoration: InputDecoration(
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: c_sec_yellow),
-                      ),
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: c_pri_yellow),
-                      )
-                    ),
-                  ),
-                ),
-                SizedBox(width: 40),
-                Expanded(
-                  flex: 1,
-                  child: AddRemoveButton(onChanged: (int) {  },)),
-              ],
-            ),
+    // Filter out any duplicate ingredients based on ID
+    final uniqueIngredients = ingredientOptions.toSet().toList();
+    
+    return Row(
+      children: [
+        Expanded(
+          flex: 2,
+          child: DropdownButtonFormField<Ingredient>(
+            value: selectedIngredient,
+            items: uniqueIngredients.map((ingredient) {
+              return DropdownMenuItem<Ingredient>(
+                value: ingredient,
+                child: Text(ingredient.name),
+              );
+            }).toList(),
+            onChanged: onIngredientChanged,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: c_sec_yellow),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: c_sec_yellow),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: c_pri_yellow),
+              ),
             ),
           ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: IconButton(
-              onPressed: _addIngredientField,
-              icon: Icon(Icons.add),
-              iconSize: 16,
-              color: c_pri_yellow,
-              constraints: BoxConstraints(maxHeight: 32, maxWidth: 32),
-            ),
-          ),
-        ],
-      ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          flex: 1,
+          child: AddRemoveButton(
+            initialValue: int.tryParse(quantity ?? '0') ?? 0,
+            onChanged: onQuantityChanged
+          )
+        ),
+        IconButton(
+          onPressed: onRemove, 
+          icon: Icon(Icons.remove_circle),
+          color: c_pri_yellow,
+        )
+      ],
     );
   }
 }
 
-final List<DropdownCategory> _dropdownCategories = [
-  DropdownCategory(categoryName: 'Pending'),
-  DropdownCategory(categoryName: 'Accepted'),
-  DropdownCategory(categoryName: 'Preparing '),
-  DropdownCategory(categoryName: 'Completed'),
-  DropdownCategory(categoryName: 'Cancelled'),
+class IngredientDropdownSection extends StatefulWidget {
+  final List<Ingredient> ingredientOptions;
+  final List<IngredientWithQuantity> selectedIngredients;
+  final Function(List<IngredientWithQuantity>) onChanged;
+
+  const IngredientDropdownSection({
+    super.key,
+    required this.ingredientOptions,
+    required this.selectedIngredients,
+    required this.onChanged,
+  });
+
+  @override
+  State<IngredientDropdownSection> createState() => _IngredientDropdownSectionState();
+}
+
+class _IngredientDropdownSectionState extends State<IngredientDropdownSection> {
+  List<Map<String, Object?>> ingredients = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeIngredients();
+  }
+
+  @override
+  void didUpdateWidget(IngredientDropdownSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedIngredients != widget.selectedIngredients) {
+      _initializeIngredients();
+    }
+  }
+
+  void _initializeIngredients() {
+    setState(() {
+      ingredients = widget.selectedIngredients.map((iwq) => {
+        'ingredient': iwq.ingredient as Object?,
+        'quantity': iwq.quantity.toString() as Object?,
+      }).toList();
+    });
+  }
+
+  void _addIngredientField() {
+    setState(() {
+      ingredients.add({
+        'ingredient': null as Object?,
+        'quantity': '0' as Object?,
+      });
+    });
+    widget.onChanged(_notifyParent());
+  }
+
+  void _removeIngredientField(int index) {
+    setState(() {
+      ingredients.removeAt(index);
+    });
+    widget.onChanged(_notifyParent());
+  }
+
+  void _updateIngredient(int index, Ingredient? ingredient) {
+    setState(() {
+      ingredients[index]['ingredient'] = ingredient as Object?;
+    });
+    widget.onChanged(_notifyParent());
+  }
+
+  void _updateQuantity(int index, String quantity) {
+    setState(() {
+      ingredients[index]['quantity'] = quantity as Object?;
+    });
+    widget.onChanged(_notifyParent());
+  }
+
+  List<IngredientWithQuantity> _notifyParent() {
+    return ingredients
+      .where((e) => e['ingredient'] != null && (e['quantity'] as String).isNotEmpty)
+      .map((e) {
+        final ingredient = e['ingredient'] as Ingredient;
+        return IngredientWithQuantity(
+          ingredient: ingredient,
+          quantity: int.tryParse(e['quantity'] as String) ?? 0,
+        );
+      }).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        bodyText(text: 'Ingredients', color: c_pri_yellow),
+        ...ingredients.asMap().entries.map((entry) { 
+          int index = entry.key;
+          Map<String, Object?> data = entry.value;
+          return Padding(
+            padding: EdgeInsets.only(bottom: 4),
+            child: IngredientQuantityInput(
+              ingredientOptions: widget.ingredientOptions, 
+              selectedIngredient: data['ingredient'] as Ingredient?, 
+              quantity: data['quantity'] as String?, 
+              onIngredientChanged: (ingredient) => _updateIngredient(index, ingredient), 
+              onQuantityChanged: (value) => _updateQuantity(index, value.toString()), 
+              onRemove: () => _removeIngredientField(index)
+            ),
+          );
+        }),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: IconButton(
+            onPressed: _addIngredientField,
+            icon: Icon(Icons.add),
+            iconSize: 16,
+            color: c_pri_yellow,
+            constraints: BoxConstraints(maxHeight: 32, maxWidth: 32),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+final List<DropdownCategory> ingredientCategories = [
+  DropdownCategory(categoryName: 'Protein'),
+  DropdownCategory(categoryName: 'Vegetables'),
+  DropdownCategory(categoryName: 'Baking Essentials'),
+  DropdownCategory(categoryName: 'Liquids'),
+  DropdownCategory(categoryName: 'Condiments'),
+];
+
+final List<DropdownCategory> foodCategories = [
+  DropdownCategory(categoryName: 'Mains'),
+  DropdownCategory(categoryName: 'Appetizers'),
+  DropdownCategory(categoryName: 'Pastries'),
+  DropdownCategory(categoryName: 'Beverages'),
 ];
 
 class DropdownCategory {
@@ -96,34 +218,37 @@ class DropdownCategory {
   DropdownCategory({required this.categoryName});
 }
 
-class DropdownMenuCategories extends StatefulWidget {
-  final Function(DropdownCategory?) onChanged;
-  final String? initialValue;
+class DropdownMenuCategories<T> extends StatefulWidget {
+  final List<T> items;
+  final String Function(T) getLabel;
+  final Function(T?) onChanged;
+  final T? initialValue;
 
-  const DropdownMenuCategories({super.key, required this.onChanged, this.initialValue});
+  const DropdownMenuCategories({
+    super.key, 
+    required this.items,
+    required this.getLabel,
+    required this.onChanged, 
+    this.initialValue, 
+  });
 
   @override
-  State<DropdownMenuCategories> createState() => _DropdownMenuCategoriesState();
+  State<DropdownMenuCategories> createState() => _DropdownMenuCategoriesState<T>();
 }
 
-class _DropdownMenuCategoriesState extends State<DropdownMenuCategories> {
-  DropdownCategory? selectedCategory;
+class _DropdownMenuCategoriesState<T> extends State<DropdownMenuCategories<T>> {
+  T? selectedCategory;
 
   @override
   void initState() {
     super.initState();
     // If editing, set the initial selection from the passed initialValue
-    if (widget.initialValue != null) {
-      selectedCategory = _dropdownCategories.firstWhere(
-        (cat) => cat.categoryName == widget.initialValue,
-        orElse: () => _dropdownCategories.first,
-      );
-    }
+    selectedCategory = widget.initialValue;
   }
 
   @override
   Widget build(BuildContext context) {
-    return DropdownMenu<DropdownCategory>(
+    return DropdownMenu<T>(
       initialSelection: selectedCategory,
       onSelected: (value) {
         setState(() {
@@ -131,10 +256,10 @@ class _DropdownMenuCategoriesState extends State<DropdownMenuCategories> {
         });
         widget.onChanged(value);
       },
-      dropdownMenuEntries: _dropdownCategories.map((category) {
-        return DropdownMenuEntry<DropdownCategory>(
-          value: category,
-          label: category.categoryName,
+      dropdownMenuEntries: widget.items.map((item) {
+        return DropdownMenuEntry<T>(
+          value: item,
+          label: widget.getLabel(item),
           style: ButtonStyle(
             maximumSize: WidgetStatePropertyAll(Size(double.infinity, double.infinity))
           )
@@ -147,8 +272,9 @@ class _DropdownMenuCategoriesState extends State<DropdownMenuCategories> {
 class ImageUploader extends StatefulWidget {
   final Function(String) onImageUploaded;
   final String? initialImageUrl;
+  final String bucketName;
 
-  const ImageUploader({super.key, required this.onImageUploaded, this.initialImageUrl});
+  const ImageUploader({super.key, required this.onImageUploaded, this.initialImageUrl, required this.bucketName});
 
   @override
   State<ImageUploader> createState() => _ImageUploaderState();
@@ -175,12 +301,12 @@ class _ImageUploaderState extends State<ImageUploader> {
   
       try {
         final storageResponse = await Supabase.instance.client.storage
-            .from('ingredient-images') // bucket name
+            .from(widget.bucketName) // bucket name
             .upload(fileName, file);
         
         if (storageResponse.isNotEmpty) {
           final imageUrl = Supabase.instance.client.storage
-              .from('ingredient-images')
+              .from(widget.bucketName)
               .getPublicUrl(fileName);
         
           setState(() {
