@@ -18,23 +18,43 @@ class _AdminSignInRouteState extends State<AdminSignInRoute> {
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  
+  // Add error message state
+  String? _errorMessage;
 
   void login() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
-    if (email.isEmpty || password.isEmpty) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please enter email and password')),
-        );
-      }
+    // Clear previous error message
+    setState(() {
+      _errorMessage = null;
+    });
+
+    // Input validation
+    if (email.isEmpty && password.isEmpty) {
+      setState(() {
+        _errorMessage = 'Please enter email and password';
+      });
+      return;
+    }
+    
+    if (email.isEmpty) {
+      setState(() {
+        _errorMessage = '*Please enter email';
+      });
+      return;
+    } 
+    
+    if (password.isEmpty) {
+      setState(() {
+        _errorMessage = '*Please enter password';
+      });
       return;
     }
 
     try {
-      final response =
-          await authService.signInWithEmailPassword(email, password);
+      final response = await authService.signInWithEmailPassword(email, password);
       final user = response.user;
 
       if (user != null) {
@@ -55,32 +75,41 @@ class _AdminSignInRouteState extends State<AdminSignInRoute> {
           }
         } else {
           await authService.signOut();
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content: Text('Access denied: Account is not an admin.')),
-            );
-          }
+          setState(() {
+            _errorMessage = 'Access denied: Account is not an admin';
+          });
         }
       } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('Login failed. Account does not exist')),
-          );
-        }
+        setState(() {
+          _errorMessage = 'Login failed. Account does not exist';
+        });
       }
+    } on AuthApiException catch (e) {
+      // Handle specific authentication errors
+      String errorMessage;
+      
+      if (e.statusCode == '400') {
+        // Invalid email or password
+        errorMessage = 'Invalid email or password';
+      } else if (e.statusCode == '422') {
+        // Email not confirmed or other validation errors
+        errorMessage = 'Please check your email and password';
+      } else {
+        // Other auth errors
+        errorMessage = 'Login failed. Please try again';
+      }
+      
+      setState(() {
+        _errorMessage = errorMessage;
+      });
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
+      // Handle other general errors
+      setState(() {
+        _errorMessage = 'An error occurred. Please try again';
+      });
     }
   }
 
-  // UI Part
-  // UI Part
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,6 +141,20 @@ class _AdminSignInRouteState extends State<AdminSignInRoute> {
                     hintText: 'Password',
                     controller: _passwordController,
                     obscureText: true),
+                
+                // Error message display
+                if (_errorMessage != null) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    _errorMessage!,
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+                
                 const SizedBox(height: 25),
                 ActionButton(
                   buttonName: 'Sign In',
