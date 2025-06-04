@@ -7,16 +7,17 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../Schemas/Ingredient.dart';
 
 class AddIngredientTemplate extends StatefulWidget {
+  const AddIngredientTemplate({super.key});
   @override
   State<AddIngredientTemplate> createState() => _AddIngredientTemplateState();
 }
 
 class _AddIngredientTemplateState extends State<AddIngredientTemplate> {
+  final _formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
   final unitController = TextEditingController();
   DropdownCategory? _selectedCategory;
-  late int quantity;
-  String? _imageUrl;
+  int quantity = 0;
 
   @override
   void initState() {
@@ -25,18 +26,43 @@ class _AddIngredientTemplateState extends State<AddIngredientTemplate> {
   }
 
   Future<void> _addIngredient() async {
+    if (_formKey.currentState!.validate()) {
+      final nameToCheck = nameController.text.trim();
 
-    await Supabase.instance.client.from('ingredients').insert({
-      'id': DateTime.now().millisecondsSinceEpoch,
-      'name': nameController.text,
-      'unit': unitController.text,
-      'category': _selectedCategory?.categoryName,
-      'quantity': quantity,
-      'image_url': _imageUrl,
-    });
+      try {
+        // Query Supabase to check if ingredient name already exists
+        final existing = await Supabase.instance.client
+            .from('ingredients')
+            .select('name')
+            .eq('name', nameToCheck)
+            .maybeSingle();
 
-    Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Ingredient added!")));
+        if (existing != null) {
+          // Ingredient with this name already exists
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Ingredient already exists.")),
+          );
+          return; // Don't proceed
+        }
+
+        // If not exists, insert new ingredient
+        await Supabase.instance.client.from('ingredients').insert({
+          'name': nameToCheck,
+          'unit': unitController.text.trim(),
+          'category': _selectedCategory?.categoryName,
+          'quantity': quantity,
+        });
+
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Ingredient added!")),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to add ingredient: $e")),
+        );
+      }
+    }
   }
 
   @override
@@ -47,117 +73,101 @@ class _AddIngredientTemplateState extends State<AddIngredientTemplate> {
         child: Column(
           children: [
             TitleSectionButton(
-              leftmost: YellowBackButton(), 
-              left: Heading4_Text(text: 'Add Ingredient', color: c_pri_yellow)
+              leftmost: YellowBackButton(),
+              left: Heading4_Text(text: 'Add Ingredient', color: c_pri_yellow),
             ),
             SizedBox(height: 8),
-            ImageUploader(
-              bucketName: 'ingredient-images',
-              onImageUploaded: (url) {
-                setState(() {
-                  _imageUrl = url;
-                });
-              },
-            ),
             Expanded(
               child: Container(
-                  margin: EdgeInsets.all(0),
-                  padding: EdgeInsets.all(16),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.zero,
-                      child: Column(
+                padding: const EdgeInsets.all(16),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           bodyText(text: 'Name', color: c_pri_yellow),
-                          SizedBox(height: 4),
-                          TextField(
+                          const SizedBox(height: 4),
+                          TextFormField(
                             controller: nameController,
-                            decoration: InputDecoration(
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: c_sec_yellow),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: c_pri_yellow),
-                            )
-                          ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.zero,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          bodyText(text: 'Measurement by', color: c_pri_yellow),
-                          SizedBox(height: 4),
-                          TextField(
-                            controller: unitController,
+                            validator: (value) =>
+                                value == null || value.trim().isEmpty
+                                    ? 'Name is required'
+                                    : null,
                             decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: c_sec_yellow),
-                              ),
+                                  borderSide: BorderSide(color: c_sec_yellow)),
                               focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: c_pri_yellow),
-                              )
+                                  borderSide: BorderSide(color: c_pri_yellow)),
                             ),
+                          ),
+                          const SizedBox(height: 16),
+                          bodyText(text: 'Measurement by', color: c_pri_yellow),
+                          const SizedBox(height: 4),
+                          TextFormField(
+                            controller: unitController,
+                            validator: (value) =>
+                                value == null || value.trim().isEmpty
+                                    ? 'Measurement is required'
+                                    : null,
+                            decoration: InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: c_sec_yellow)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: c_pri_yellow)),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                flex: 2,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    bodyText(
+                                        text: 'Category', color: c_pri_yellow),
+                                    const SizedBox(height: 4),
+                                    DropdownMenuCategories<DropdownCategory>(
+                                      items: ingredientCategories,
+                                      initialValue: _selectedCategory,
+                                      getLabel: (cat) => cat.categoryName,
+                                      onChanged: (value) => setState(
+                                          () => _selectedCategory = value),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                flex: 1,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    bodyText(
+                                        text: 'Quantity', color: c_pri_yellow),
+                                    const SizedBox(height: 8),
+                                    AddRemoveButton(
+                                      initialValue: quantity,
+                                      onChanged: (val) =>
+                                          setState(() => quantity = val),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: SizedBox(
-                            width: double.infinity,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                bodyText(text: 'Category', color: c_pri_yellow),
-                                SizedBox(height: 4),
-                                DropdownMenuCategories<DropdownCategory>(
-                                  items: ingredientCategories,
-                                  initialValue: _selectedCategory,
-                                  getLabel: (cat) => cat.categoryName,
-                                  onChanged: (DropdownCategory? value) {
-                                    setState(() {
-                                      _selectedCategory = value;
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              bodyText(text: 'Quantity', color: c_pri_yellow),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8.0),
-                                child: AddRemoveButton(onChanged: (_quantity) {
-                                  setState(() {
-                                    quantity = _quantity;
-                                  });
-                                }),
-                              ),
-                            ]
-                          ),
-                        ),
-                      ],
-                    ),
-                    ActionButton(buttonName: 'Add Ingredient', backgroundColor: c_pri_yellow, 
-                        onPressed: () { 
-                          _addIngredient();
-                    },)
-                  ],
+                      ActionButton(
+                        buttonName: 'Add Ingredient',
+                        backgroundColor: c_pri_yellow,
+                        onPressed: _addIngredient,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -170,49 +180,55 @@ class _AddIngredientTemplateState extends State<AddIngredientTemplate> {
 
 class EditIngredientTemplate extends StatefulWidget {
   final Ingredient ingredient;
-
   EditIngredientTemplate({super.key, required this.ingredient});
-  
+
   @override
   State<EditIngredientTemplate> createState() => _EditIngredientTemplateState();
 }
 
 class _EditIngredientTemplateState extends State<EditIngredientTemplate> {
+  final _formKey = GlobalKey<FormState>();
+
   late TextEditingController nameController;
   late TextEditingController unitController;
   late int quantity;
-  String? _selectedCategory;
-  String? _imageUrl;
-  late DropdownCategory matchedCategory;
+  DropdownCategory? _selectedCategory;
 
   @override
   void initState() {
     super.initState();
     nameController = TextEditingController(text: widget.ingredient.name);
     unitController = TextEditingController(text: widget.ingredient.unit);
-    quantity = widget.ingredient.quantity;
-    _selectedCategory = widget.ingredient.category;
-    _imageUrl = widget.ingredient.imageUrl;
-    matchedCategory = ingredientCategories.firstWhere(
-      (cat) => cat.categoryName == _selectedCategory,
+    quantity = widget.ingredient.quantity.toInt();
+
+    _selectedCategory = ingredientCategories.firstWhere(
+      (cat) => cat.categoryName == widget.ingredient.category,
       orElse: () => ingredientCategories[0],
     );
   }
-  
-  Future<void> updateIngredient() async {
-    final id = widget.ingredient.id;
 
-    await Supabase.instance.client.from('ingredients').update({
-      'name': nameController.text,
-      'unit': unitController.text,
-      'category': _selectedCategory,
-      'quantity': quantity,
-      'image_url': _imageUrl,
-    })
-    .eq('id', id);
-
-    Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Ingredient updated!")));
+  Future<void> _updateIngredient() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        await Supabase.instance.client.from('ingredients').upsert(
+          {
+            'name': nameController.text.trim(),
+            'unit': unitController.text.trim(),
+            'category': _selectedCategory?.categoryName,
+            'quantity': quantity,
+          },
+          onConflict: 'name',
+        );
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Ingredient updated!")),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to update ingredient: $e")),
+        );
+      }
+    }
   }
 
   @override
@@ -223,120 +239,102 @@ class _EditIngredientTemplateState extends State<EditIngredientTemplate> {
         child: Column(
           children: [
             TitleSectionButton(
-              leftmost: YellowBackButton(), 
-              left: Heading4_Text(text: 'Edit Ingredient', color: c_pri_yellow)
+              leftmost: YellowBackButton(),
+              left: Heading4_Text(text: 'Edit Ingredient', color: c_pri_yellow),
             ),
-            SizedBox(height: 8),
-            ImageUploader(
-              bucketName: 'ingredient-images',
-              initialImageUrl: _imageUrl,
-              onImageUploaded: (url) {
-                setState(() {
-                  _imageUrl = url;
-                });
-              },
-            ),
+            const SizedBox(height: 8),
             Expanded(
               child: Container(
-                  margin: EdgeInsets.all(0),
-                  padding: EdgeInsets.all(16),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.zero,
-                      child: Column(
+                padding: const EdgeInsets.all(16),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           bodyText(text: 'Name', color: c_pri_yellow),
-                          SizedBox(height: 4),
-                          TextField(
+                          const SizedBox(height: 4),
+                          TextFormField(
                             controller: nameController,
-                            decoration: InputDecoration(
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: c_sec_yellow),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: c_pri_yellow),
-                            )
-                          ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.zero,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          bodyText(text: 'Measurement by', color: c_pri_yellow),
-                          SizedBox(height: 4),
-                          TextField(
-                            controller: unitController,
+                            validator: (value) =>
+                                value == null || value.trim().isEmpty
+                                    ? 'Name is required'
+                                    : null,
                             decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: c_sec_yellow),
-                              ),
+                                  borderSide: BorderSide(color: c_sec_yellow)),
                               focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: c_pri_yellow),
-                              )
+                                  borderSide: BorderSide(color: c_pri_yellow)),
                             ),
+                          ),
+                          const SizedBox(height: 16),
+                          bodyText(text: 'Measurement by', color: c_pri_yellow),
+                          const SizedBox(height: 4),
+                          TextFormField(
+                            controller: unitController,
+                            validator: (value) =>
+                                value == null || value.trim().isEmpty
+                                    ? 'Measurement is required'
+                                    : null,
+                            decoration: InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: c_sec_yellow)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: c_pri_yellow)),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                flex: 2,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    bodyText(
+                                        text: 'Category', color: c_pri_yellow),
+                                    const SizedBox(height: 4),
+                                    DropdownMenuCategories<DropdownCategory>(
+                                      items: ingredientCategories,
+                                      initialValue: _selectedCategory,
+                                      getLabel: (cat) => cat.categoryName,
+                                      onChanged: (newValue) => setState(() {
+                                        _selectedCategory = newValue;
+                                      }),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                flex: 1,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    bodyText(
+                                        text: 'Quantity', color: c_pri_yellow),
+                                    const SizedBox(height: 8),
+                                    AddRemoveButton(
+                                      initialValue: quantity,
+                                      onChanged: (val) =>
+                                          setState(() => quantity = val),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: SizedBox(
-                            width: double.infinity,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                bodyText(text: 'Category', color: c_pri_yellow),
-                                SizedBox(height: 4),
-                                DropdownMenuCategories<DropdownCategory>(
-                                  items: ingredientCategories,
-                                  initialValue: matchedCategory,
-                                  getLabel: (cat) => cat.categoryName,
-                                  onChanged: (DropdownCategory? newValue) {
-                                    setState(() {
-                                      _selectedCategory = newValue?.categoryName;
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              bodyText(text: 'Quantity', color: c_pri_yellow),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8.0),
-                                child: AddRemoveButton(
-                                  initialValue: quantity,
-                                  onChanged: (_quantity) {
-                                  setState(() {
-                                    quantity = _quantity;
-                                  });
-                                }),
-                              ),
-                            ]
-                          ),
-                        ),
-                      ],
-                    ),
-                    ActionButton(buttonName: 'Save Changes', backgroundColor: c_pri_yellow, 
-                        onPressed: () { 
-                          updateIngredient();
-                    },)
-                  ],
+                      ActionButton(
+                        buttonName: 'Save Changes',
+                        backgroundColor: c_pri_yellow,
+                        onPressed: _updateIngredient,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

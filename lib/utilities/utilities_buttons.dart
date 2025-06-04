@@ -22,7 +22,8 @@ class AddRemoveButton extends StatefulWidget {
   final int initialValue;
   final Function(int) onChanged;
 
-  const AddRemoveButton({super.key, this.initialValue = 0, required this.onChanged});
+  const AddRemoveButton(
+      {super.key, this.initialValue = 0, required this.onChanged});
 
   @override
   State<AddRemoveButton> createState() => _AddRemoveButtonState();
@@ -135,7 +136,7 @@ class _AddRemoveButtonState extends State<AddRemoveButton> {
   }
 }
 
-class WhiteBackButton extends StatelessWidget{
+class WhiteBackButton extends StatelessWidget {
   const WhiteBackButton({super.key});
 
   @override
@@ -154,7 +155,152 @@ class WhiteBackButton extends StatelessWidget{
   }
 }
 
-class YellowBackButton extends StatelessWidget{
+class AddRemoveDecimalButton extends StatefulWidget {
+  final double initialValue;
+  final void Function(double) onChanged;
+
+  const AddRemoveDecimalButton({
+    super.key,
+    this.initialValue = 0,
+    required this.onChanged,
+  });
+
+  @override
+  State<AddRemoveDecimalButton> createState() => _AddRemoveDecimalButtonState();
+}
+
+class _AddRemoveDecimalButtonState extends State<AddRemoveDecimalButton> {
+  late double _value;
+  late TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _value = widget.initialValue;
+    _controller = TextEditingController(text: _value.toString());
+  }
+
+  @override
+  void didUpdateWidget(covariant AddRemoveDecimalButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialValue != widget.initialValue) {
+      _value = widget.initialValue;
+      _controller.text = _value.toString();
+    }
+  }
+
+  void _increment() {
+    setState(() {
+      _value += 0.5;
+      _controller.text = _value.toString();
+    });
+    widget.onChanged(_value);
+  }
+
+  void _decrement() {
+    if (_value > 0) {
+      setState(() {
+        _value -= 0.5;
+        if (_value < 0) _value = 0;
+        _controller.text = _value.toString();
+      });
+      widget.onChanged(_value);
+    }
+  }
+
+  void _onChanged(String text) {
+    final parsed = double.tryParse(text);
+    if (parsed != null && parsed >= 0) {
+      _value = parsed;
+      widget.onChanged(_value);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double iconButtonSize = screenWidth * 0.04;
+    double quantityBoxSize = screenWidth * 0.08;
+    double subtitleFontSize = screenWidth * 0.04;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Remove Button
+        SizedBox(
+          width: quantityBoxSize,
+          height: quantityBoxSize,
+          child: IconButton.filled(
+            onPressed: _decrement,
+            icon: const Icon(Icons.remove),
+            iconSize: iconButtonSize,
+            style: ButtonStyle(
+              padding: MaterialStateProperty.all(EdgeInsets.zero),
+              shape: MaterialStateProperty.all(
+                const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(4),
+                    bottomLeft: Radius.circular(4),
+                  ),
+                ),
+              ),
+              backgroundColor: MaterialStateProperty.all(c_pri_yellow),
+              foregroundColor: MaterialStateProperty.all(c_white),
+            ),
+          ),
+        ),
+
+        // Editable Quantity Box
+        Container(
+          width: quantityBoxSize * 1.3,
+          height: quantityBoxSize,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            border: Border.all(color: c_pri_yellow),
+          ),
+          child: TextField(
+            controller: _controller,
+            keyboardType: TextInputType.number,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: subtitleFontSize),
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              isDense: true,
+              contentPadding: EdgeInsets.zero,
+            ),
+            onChanged: _onChanged,
+          ),
+        ),
+
+        // Add Button
+        SizedBox(
+          width: quantityBoxSize,
+          height: quantityBoxSize,
+          child: IconButton.filled(
+            onPressed: _increment,
+            icon: const Icon(Icons.add),
+            iconSize: iconButtonSize,
+            style: ButtonStyle(
+              padding: MaterialStateProperty.all(EdgeInsets.zero),
+              shape: MaterialStateProperty.all(
+                const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(4),
+                    bottomRight: Radius.circular(4),
+                  ),
+                ),
+              ),
+              backgroundColor: MaterialStateProperty.all(c_pri_yellow),
+              foregroundColor: MaterialStateProperty.all(c_white),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class YellowBackButton extends StatelessWidget {
   const YellowBackButton({super.key});
 
   @override
@@ -174,7 +320,11 @@ class YellowBackButton extends StatelessWidget{
 }
 
 class ActionButton extends StatelessWidget {
-  const ActionButton({super.key, required this.buttonName, this.backgroundColor, required this.onPressed});
+  const ActionButton(
+      {super.key,
+      required this.buttonName,
+      this.backgroundColor,
+      required this.onPressed});
 
   final String buttonName;
   final Color? backgroundColor;
@@ -192,12 +342,12 @@ class ActionButton extends StatelessWidget {
     return Container(
       width: double.infinity,
       child: ElevatedButton(
-        style: style, 
-        onPressed: onPressed, 
+        style: style,
+        onPressed: onPressed,
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: Text(
-            buttonName, 
+            buttonName,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: c_white,
@@ -211,7 +361,13 @@ class ActionButton extends StatelessWidget {
 }
 
 class NormalButton extends StatelessWidget {
-  const NormalButton({super.key, required this.buttonName, this.backgroundColor, required this.fontColor, required this.onPressed, this.outlineColor});
+  const NormalButton(
+      {super.key,
+      required this.buttonName,
+      this.backgroundColor,
+      required this.fontColor,
+      required this.onPressed,
+      this.outlineColor});
 
   final String buttonName;
   final Color? backgroundColor;
@@ -231,28 +387,28 @@ class NormalButton extends StatelessWidget {
     return Container(
       width: double.infinity,
       child: ElevatedButton(
-        style: style, 
-        onPressed: onPressed, 
-        child:
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Text(
-                buttonName, 
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: fontColor,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'Poppins',
-                ),
-                        ),
+        style: style,
+        onPressed: onPressed,
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Text(
+            buttonName,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: fontColor,
+              fontWeight: FontWeight.w700,
+              fontFamily: 'Poppins',
             ),
+          ),
         ),
-      );
+      ),
+    );
   }
 }
 
-class ProfileButton extends StatelessWidget  {
-  const ProfileButton({super.key, required this.iconColor, required this.onPressed});
+class ProfileButton extends StatelessWidget {
+  const ProfileButton(
+      {super.key, required this.iconColor, required this.onPressed});
 
   final Color iconColor;
   final Widget Function() onPressed;
@@ -262,30 +418,30 @@ class ProfileButton extends StatelessWidget  {
     return IconButton(
       icon: Icon(Icons.account_circle),
       onPressed: () {
-        Navigator.push(context,
-          MaterialPageRoute(builder: (context) => onPressed())
-        );
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => onPressed()));
       },
       color: iconColor,
     );
   }
 }
 
-class TitleSectionButton extends StatelessWidget{
-  const TitleSectionButton({super.key, 
-    this.leftmost, 
-    this.left, 
-    this.right, 
+class TitleSectionButton extends StatelessWidget {
+  const TitleSectionButton({
+    super.key,
+    this.leftmost,
+    this.left,
+    this.right,
     this.rightmost,
-    });
+  });
 
   final Widget? leftmost;
   final Widget? left;
   final Widget? right;
   final Widget? rightmost;
-   
+
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.fromLTRB(4, 8, 4, 0),
       child: Row(
