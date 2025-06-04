@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:foodie_app/Utilities/color_palette.dart';
 import 'package:foodie_app/Utilities/utilities_texts.dart';
 import '../../Utilities/utilities_buttons.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:foodie_app/Utilities/utilities_others.dart';
 
 class AdminEditProfile extends StatefulWidget {
   @override
@@ -15,9 +16,11 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
   final TextEditingController middleNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController suffixController = TextEditingController();
-  final TextEditingController roleController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
+  final TextEditingController roleController = TextEditingController();
+
+  String? _imageUrl;
 
   @override
   void initState() {
@@ -37,14 +40,14 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
 
     if (response != null) {
       setState(() {
-        // Add Profile Pic
         firstNameController.text = response['first_name'] ?? '';
         middleNameController.text = response['middle_name'] ?? '';
         lastNameController.text = response['last_name'] ?? '';
         suffixController.text = response['suffix'] ?? '';
-        roleController.text = response['role'] ?? '';
         phoneController.text = response['phone_number'] ?? '';
         emailController.text = response['email'] ?? '';
+        roleController.text = response['role'] ?? '';
+        _imageUrl = response['image_url'];
       });
     }
   }
@@ -55,14 +58,14 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
       if (userId == null) return;
 
       final updates = {
-        // Add Profile Pic
         'first_name': firstNameController.text.trim(),
         'middle_name': middleNameController.text.trim(),
         'last_name': lastNameController.text.trim(),
         'suffix': suffixController.text.trim(),
-        'role': roleController.text.trim(),
         'phone_number': phoneController.text.trim(),
-        'email': emailController.text.trim()
+        'email': emailController.text.trim(),
+        'role': roleController.text.trim(),
+        'image_url': _imageUrl, // Will be null if removed
       };
 
       await Supabase.instance.client
@@ -72,6 +75,10 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
 
       if (!mounted) return;
 
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Profile updated successfully')),
+      );
+
       Navigator.pop(context, true);
     }
   }
@@ -80,6 +87,7 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
     required String label,
     required TextEditingController controller,
     bool requiredField = false,
+    bool enabled = true,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -90,6 +98,7 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
           SizedBox(height: 4),
           TextFormField(
             controller: controller,
+            enabled: enabled,
             validator: requiredField
                 ? (value) =>
                     value == null || value.trim().isEmpty ? 'Required' : null
@@ -114,9 +123,9 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
     middleNameController.dispose();
     lastNameController.dispose();
     suffixController.dispose();
-    roleController.dispose();
     phoneController.dispose();
     emailController.dispose();
+    roleController.dispose();
     super.dispose();
   }
 
@@ -139,8 +148,54 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
                   key: _formKey,
                   child: Column(
                     children: [
+                      Stack(
+                        alignment: Alignment.topRight,
+                        children: [
+                          CircleAvatar(
+                            radius: 48,
+                            backgroundImage: _imageUrl != null
+                                ? NetworkImage(_imageUrl!)
+                                : AssetImage(
+                                        'lib/images/admin_default_profile.png')
+                                    as ImageProvider,
+                          ),
+                          if (_imageUrl != null)
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              child: Container(
+                                height: 24,
+                                width: 24,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: IconButton(
+                                  padding: EdgeInsets.zero,
+                                  constraints: BoxConstraints(),
+                                  icon: Icon(Icons.close,
+                                      size: 16, color: Colors.red),
+                                  onPressed: () {
+                                    setState(() {
+                                      _imageUrl = null;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      SizedBox(height: 12),
+                      ImageUploader(
+                        initialImageUrl: _imageUrl,
+                        onImageUploaded: (url) {
+                          setState(() {
+                            _imageUrl = url;
+                          });
+                        },
+                      ),
+                      SizedBox(height: 12),
                       buildTextField(
-                        // Add Profile Pic
                           label: 'First Name',
                           controller: firstNameController,
                           requiredField: true),
@@ -153,21 +208,16 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
                           controller: lastNameController,
                           requiredField: true),
                       buildTextField(
-                          label: 'Suffix',
-                          controller: suffixController,
-                          requiredField: false),
+                          label: 'Suffix', controller: suffixController),
+                      buildTextField(label: 'Role', controller: roleController),
                       buildTextField(
-                          label: 'Role',
-                          controller: roleController,
-                          requiredField: false),
+                          label: 'Phone Number',
+                          controller: phoneController,
+                          requiredField: true),
                       buildTextField(
                           label: 'Email',
                           controller: emailController,
                           requiredField: true),
-                      buildTextField(
-                          label: 'Phone Number',
-                          controller: phoneController,
-                          requiredField: true)
                     ],
                   ),
                 ),

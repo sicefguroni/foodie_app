@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:foodie_app/Utilities/color_palette.dart';
 import 'package:foodie_app/Utilities/utilities_texts.dart';
 import '../../Utilities/utilities_buttons.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:foodie_app/Utilities/utilities_others.dart';
 
 class CustomerEditProfile extends StatefulWidget {
   @override
@@ -18,6 +19,8 @@ class _CustomerEditProfileState extends State<CustomerEditProfile> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
+
+  String? _imageUrl;
 
   @override
   void initState() {
@@ -37,7 +40,6 @@ class _CustomerEditProfileState extends State<CustomerEditProfile> {
 
     if (response != null) {
       setState(() {
-        // Add Profile Pic
         firstNameController.text = response['first_name'] ?? '';
         middleNameController.text = response['middle_name'] ?? '';
         lastNameController.text = response['last_name'] ?? '';
@@ -45,6 +47,7 @@ class _CustomerEditProfileState extends State<CustomerEditProfile> {
         phoneController.text = response['phone_number'] ?? '';
         emailController.text = response['email'] ?? '';
         addressController.text = response['address'] ?? '';
+        _imageUrl = response['image_url'];
       });
     }
   }
@@ -55,7 +58,6 @@ class _CustomerEditProfileState extends State<CustomerEditProfile> {
       if (userId == null) return;
 
       final updates = {
-        // Add Profile Pic
         'first_name': firstNameController.text.trim(),
         'middle_name': middleNameController.text.trim(),
         'last_name': lastNameController.text.trim(),
@@ -63,6 +65,7 @@ class _CustomerEditProfileState extends State<CustomerEditProfile> {
         'phone_number': phoneController.text.trim(),
         'email': emailController.text.trim(),
         'address': addressController.text.trim(),
+        'image_url': _imageUrl,
       };
 
       await Supabase.instance.client
@@ -71,7 +74,11 @@ class _CustomerEditProfileState extends State<CustomerEditProfile> {
           .eq('id', userId);
 
       if (!mounted) return;
-    
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Profile updated successfully')),
+      );
+
       Navigator.pop(context, true);
     }
   }
@@ -80,6 +87,7 @@ class _CustomerEditProfileState extends State<CustomerEditProfile> {
     required String label,
     required TextEditingController controller,
     bool requiredField = false,
+    bool enabled = true,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -90,6 +98,7 @@ class _CustomerEditProfileState extends State<CustomerEditProfile> {
           SizedBox(height: 4),
           TextFormField(
             controller: controller,
+            enabled: enabled,
             validator: requiredField
                 ? (value) =>
                     value == null || value.trim().isEmpty ? 'Required' : null
@@ -139,7 +148,44 @@ class _CustomerEditProfileState extends State<CustomerEditProfile> {
                   key: _formKey,
                   child: Column(
                     children: [
-                      // Add Profile Pic
+                      Stack(
+                        alignment: Alignment.topRight,
+                        children: [
+                          CircleAvatar(
+                            radius: 48,
+                            backgroundImage: _imageUrl != null
+                                ? NetworkImage(_imageUrl!)
+                                : AssetImage(
+                                        'lib/images/customer_default_profile.png')
+                                    as ImageProvider,
+                          ),
+                          if (_imageUrl != null)
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              child: Container(
+                                height: 24,
+                                width: 24,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: IconButton(
+                                  padding: EdgeInsets.zero,
+                                  constraints: BoxConstraints(),
+                                  icon: Icon(Icons.close,
+                                      size: 16, color: Colors.red),
+                                  onPressed: () {
+                                    setState(() {
+                                      _imageUrl = null;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      SizedBox(height: 12),
                       buildTextField(
                           label: 'First Name',
                           controller: firstNameController,
@@ -153,9 +199,7 @@ class _CustomerEditProfileState extends State<CustomerEditProfile> {
                           controller: lastNameController,
                           requiredField: true),
                       buildTextField(
-                          label: 'Suffix',
-                          controller: suffixController,
-                          requiredField: false),
+                          label: 'Suffix', controller: suffixController),
                       buildTextField(
                           label: 'Phone Number',
                           controller: phoneController,
@@ -165,9 +209,7 @@ class _CustomerEditProfileState extends State<CustomerEditProfile> {
                           controller: emailController,
                           requiredField: true),
                       buildTextField(
-                          label: 'Address',
-                          controller: addressController,
-                          requiredField: false),
+                          label: 'Address', controller: addressController),
                     ],
                   ),
                 ),
