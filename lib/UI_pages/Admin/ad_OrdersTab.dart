@@ -44,10 +44,10 @@ class AdminOrdersTab extends StatelessWidget {
               child: CustomTabBar(
                 tabLabels: ['Pending', 'Accepted', 'To Deliver', 'Completed'],
                 tabContents: [
-                  AdminOrdersCards(),
-                  AdminOrdersCards(),
-                  AdminOrdersCards(),
-                  AdminOrdersCards(),
+                  AdminOrdersCards(statusFilter: 'Pending'),
+                  AdminOrdersCards(statusFilter: 'Accepted'),
+                  AdminOrdersCards(statusFilter: 'To Deliver'),
+                  AdminOrdersCards(statusFilter: 'Completed'),
                 ],
               ),
             ),

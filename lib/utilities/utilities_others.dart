@@ -459,8 +459,19 @@ class CustomerAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CircleAvatar(
-      backgroundImage: AssetImage(assetName),
       radius: radius,
+      backgroundColor: Colors.grey[300],
+      child: ClipOval(
+        child: Image.network(
+          assetName ?? '', 
+          width: radius * 2,
+          height: radius * 2,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Icon(Icons.person, size: radius, color: Colors.grey[600]);
+          },
+        ),
+      )
     );
   }
 }
