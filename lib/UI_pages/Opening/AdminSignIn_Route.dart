@@ -57,14 +57,16 @@ class _AdminSignInRouteState extends State<AdminSignInRoute> {
           await authService.signOut();
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Access denied: not an admin')),
+              const SnackBar(
+                  content: Text('Access denied: Account is not an admin.')),
             );
           }
         }
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Login failed')),
+            const SnackBar(
+                content: Text('Login failed. Account does not exist')),
           );
         }
       }
@@ -85,9 +87,10 @@ class _AdminSignInRouteState extends State<AdminSignInRoute> {
       body: Column(
         children: [
           Padding(
-                padding: const EdgeInsets.only(top: 16.0, left: 0), // already padded horizontally
-                child: YellowBackButton(),
-              ),
+            padding: const EdgeInsets.only(
+                top: 16.0, left: 0), // already padded horizontally
+            child: YellowBackButton(),
+          ),
           TitleText(title: 'Foodie', color: c_pri_yellow),
           Heading3_Text(text: 'Welcome Back!', color: c_pri_yellow),
           bodyText(text: 'Admin Sign In', color: c_pri_yellow),

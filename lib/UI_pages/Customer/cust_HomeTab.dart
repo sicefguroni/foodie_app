@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'cust_Cart.dart';
 import 'package:foodie_app/Utilities/color_palette.dart';
-import 'package:foodie_app/UI_pages/Templates/account_Profile.dart';
 import '../../Utilities/utilities_cards.dart';
 import '../../Utilities/utilities_buttons.dart';
 import '../../Utilities/utilities_others.dart';
 import '../../Utilities/utilities_texts.dart';
+import 'cust_ProfilePage.dart';
 
 class CustomerHomeTab extends StatelessWidget {
   @override
@@ -36,7 +36,7 @@ class CustomerHomeTab extends StatelessWidget {
                     right: IconButton(onPressed: () {}, icon: Icon(Icons.notifications), color: c_white),
                     rightmost: ProfileButton(iconColor: c_white, 
                       onPressed: () {
-                        return ProfilePage();
+                        return CustomerProfilePage();
                       },
                     ),
                   ),

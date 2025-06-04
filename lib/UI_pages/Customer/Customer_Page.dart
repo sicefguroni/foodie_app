@@ -12,7 +12,6 @@ class CustomerPage extends StatefulWidget {
 
 class CustomerPageStates extends State<CustomerPage> {
   int _currentIndex = 0;
-
   final List<Widget> pages = [
     CustomerHomeTab(),
     CustomerOrdersTab(),
