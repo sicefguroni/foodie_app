@@ -14,14 +14,54 @@ import 'package:foodie_app/UI_pages/Templates/cust_food_Order.dart';
 // SAMPLE CARD INPUTS
 // SAMPLE CARD INPUTS
 final List<Category> _categories = [
-  Category(assetName: 'lib/images/opening-image.png', name: 'Vegetables', status: 'Available', detail: 'By kilo', isSelected: false),
-  Category(assetName: 'lib/images/opening-image.png', name: 'Vegetables', status: 'Available', detail: 'By kilo', isSelected: false),
-  Category(assetName: 'lib/images/opening-image.png', name: 'Vegetables', status: 'Available', detail: 'By kilo', isSelected: false),
-  Category(assetName: 'lib/images/opening-image.png', name: 'Vegetables', status: 'Available', detail: 'By kilo', isSelected: false),
-  Category(assetName: 'lib/images/opening-image.png', name: 'Vegetables', status: 'Available', detail: 'By kilo', isSelected: false),
-  Category(assetName: 'lib/images/opening-image.png', name: 'Vegetables', status: 'Available', detail: 'By kilo', isSelected: false),
-  Category(assetName: 'lib/images/opening-image.png', name: 'Vegetables', status: 'Available', detail: 'By kilo', isSelected: false),
-  Category(assetName: 'lib/images/opening-image.png', name: 'Vegetables', status: 'Available', detail: 'By kilo', isSelected: false),
+  Category(
+      assetName: 'lib/images/opening-image.png',
+      name: 'Vegetables',
+      status: 'Available',
+      detail: 'By kilo',
+      isSelected: false),
+  Category(
+      assetName: 'lib/images/opening-image.png',
+      name: 'Vegetables',
+      status: 'Available',
+      detail: 'By kilo',
+      isSelected: false),
+  Category(
+      assetName: 'lib/images/opening-image.png',
+      name: 'Vegetables',
+      status: 'Available',
+      detail: 'By kilo',
+      isSelected: false),
+  Category(
+      assetName: 'lib/images/opening-image.png',
+      name: 'Vegetables',
+      status: 'Available',
+      detail: 'By kilo',
+      isSelected: false),
+  Category(
+      assetName: 'lib/images/opening-image.png',
+      name: 'Vegetables',
+      status: 'Available',
+      detail: 'By kilo',
+      isSelected: false),
+  Category(
+      assetName: 'lib/images/opening-image.png',
+      name: 'Vegetables',
+      status: 'Available',
+      detail: 'By kilo',
+      isSelected: false),
+  Category(
+      assetName: 'lib/images/opening-image.png',
+      name: 'Vegetables',
+      status: 'Available',
+      detail: 'By kilo',
+      isSelected: false),
+  Category(
+      assetName: 'lib/images/opening-image.png',
+      name: 'Vegetables',
+      status: 'Available',
+      detail: 'By kilo',
+      isSelected: false),
 ];
 
 class Category {
@@ -30,12 +70,17 @@ class Category {
   final String status;
   final String detail;
   bool isSelected;
-  
-  Category({required this.assetName, required this.name, required this.status, required this.detail, this.isSelected = false});
+
+  Category(
+      {required this.assetName,
+      required this.name,
+      required this.status,
+      required this.detail,
+      this.isSelected = false});
 }
 
-// FOUND IN ad_IngredientsTab 
-// FOUND IN ad_IngredientsTab 
+// FOUND IN ad_IngredientsTab
+// FOUND IN ad_IngredientsTab
 class IngredientCategoryCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -57,10 +102,10 @@ class IngredientCategoryCard extends StatefulWidget {
   final Category category;
 
   const IngredientCategoryCard({
-    required this.category, 
+    required this.category,
     Key? key,
   }) : super(key: key);
-  
+
   @override
   State<IngredientCategoryCard> createState() => _IngredientCategoryCardState();
 }
@@ -106,7 +151,6 @@ class _IngredientCategoryCardState extends State<IngredientCategoryCard> {
   }
 }
 
-
 // FOUND IN ad_IngredientsTab && ad_FoodTab && cust_HomeTab
 // FOUND IN ad_IngredientsTab && ad_FoodTab && cust_HomeTab
 class FoodCategoryCards extends StatelessWidget {
@@ -130,10 +174,10 @@ class FoodCategoryCard extends StatefulWidget {
   final Category category;
 
   const FoodCategoryCard({
-    required this.category, 
+    required this.category,
     Key? key,
   }) : super(key: key);
-  
+
   @override
   State<FoodCategoryCard> createState() => _FoodCategoryCardState();
 }
@@ -179,7 +223,6 @@ class _FoodCategoryCardState extends State<FoodCategoryCard> {
   }
 }
 
-
 // FOUND IN ad_IngredientsTab
 // FOUND IN ad_IngredientsTab
 // Updated AdminIngredientCards with proper error handling
@@ -217,7 +260,9 @@ class _AdminIngredientCardsState extends State<AdminIngredientCards> {
       print('Supabase response: $response');
 
       setState(() {
-        ingredients = response.map<Ingredient>((json) => Ingredient.fromJson(json)).toList();
+        ingredients = response
+            .map<Ingredient>((json) => Ingredient.fromJson(json))
+            .toList();
         isLoading = false;
       });
     } catch (e) {
@@ -230,20 +275,20 @@ class _AdminIngredientCardsState extends State<AdminIngredientCards> {
 
   void setupRealtimeListener() {
     _channel = Supabase.instance.client
-      .channel('public:ingredients')
-      .onPostgresChanges(
-        event: PostgresChangeEvent.all, 
-        schema: 'public',
-        table: 'ingredients',
-        callback: (payload) {
-          fetchIngredients();
-        })
-      .subscribe();
+        .channel('public:ingredients')
+        .onPostgresChanges(
+            event: PostgresChangeEvent.all,
+            schema: 'public',
+            table: 'ingredients',
+            callback: (payload) {
+              fetchIngredients();
+            })
+        .subscribe();
   }
 
   void updateIngredientQuantity(String ingredientId, int newQuantity) {
-    final index = ingredients.indexWhere((ingredient) => 
-        ingredient.id.toString() == ingredientId);
+    final index = ingredients
+        .indexWhere((ingredient) => ingredient.id.toString() == ingredientId);
     if (index != -1) {
       setState(() {
         ingredients[index].quantity = newQuantity;
@@ -274,9 +319,11 @@ class _AdminIngredientCardsState extends State<AdminIngredientCards> {
                 return InkWell(
                   borderRadius: BorderRadius.circular(12),
                   onTap: () {
-                    Navigator.push(context, 
-                      MaterialPageRoute(builder: (_) => EditIngredientTemplate(ingredient: ingredients[index]))
-                    );
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => EditIngredientTemplate(
+                                ingredient: ingredients[index])));
                   },
                   child: AdminIngredientCard(
                     key: ValueKey(ingredients[index].id),
@@ -292,16 +339,15 @@ class _AdminIngredientCardsState extends State<AdminIngredientCards> {
     );
   }
 }
+
 // Updated AdminIngredientCard with better error handling
 class AdminIngredientCard extends StatelessWidget {
   final Ingredient ingredient;
   final Function(String, int) onQuantityChanged;
 
-  const AdminIngredientCard({
-    required this.ingredient, 
-    required this.onQuantityChanged,
-    Key? key
-  }) : super(key: key);
+  const AdminIngredientCard(
+      {required this.ingredient, required this.onQuantityChanged, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -351,11 +397,13 @@ class AdminIngredientCard extends StatelessWidget {
                     children: [
                       Text(
                         ingredient.name,
-                        style: TextStyle(fontFamily: 'Inter', fontSize: titleFontSize),
+                        style: TextStyle(
+                            fontFamily: 'Inter', fontSize: titleFontSize),
                       ),
                       Text(
                         ingredient.unit,
-                        style: TextStyle(fontFamily: 'Inter', fontSize: subtitleFontSize),
+                        style: TextStyle(
+                            fontFamily: 'Inter', fontSize: subtitleFontSize),
                       ),
                     ],
                   ),
@@ -380,7 +428,9 @@ class AdminIngredientCard extends StatelessWidget {
                           .select();
                     } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Failed to update ${ingredient.name}: ${e.toString()}')),
+                        SnackBar(
+                            content: Text(
+                                'Failed to update ${ingredient.name}: ${e.toString()}')),
                       );
                     }
                   },
@@ -401,7 +451,9 @@ class AdminIngredientCard extends StatelessWidget {
                           .eq('id', ingredient.id);
                     } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Failed to delete ${ingredient.name}: ${e.toString()}')),
+                        SnackBar(
+                            content: Text(
+                                'Failed to delete ${ingredient.name}: ${e.toString()}')),
                       );
                     }
                   },
@@ -427,7 +479,7 @@ class _AdminFoodCardsState extends State<AdminFoodCards> {
   bool isLoading = true;
   RealtimeChannel? _channel;
 
-  @override 
+  @override
   void initState() {
     super.initState();
     fetchFoods();
@@ -443,9 +495,9 @@ class _AdminFoodCardsState extends State<AdminFoodCards> {
   Future<void> fetchFoods() async {
     try {
       final response = await Supabase.instance.client
-        .from('products')
-        .select('*')
-        .order('product_name', ascending: true);
+          .from('products')
+          .select('*')
+          .order('product_name', ascending: true);
 
       print('Supabase response: $response');
 
@@ -463,15 +515,15 @@ class _AdminFoodCardsState extends State<AdminFoodCards> {
 
   void setupRealtimeListener() {
     _channel = Supabase.instance.client
-      .channel('public:products')
-      .onPostgresChanges(
-        event: PostgresChangeEvent.all, 
-        schema: 'public',
-        table: 'products',
-        callback: (payload) {
-          fetchFoods();
-        })
-      .subscribe();
+        .channel('public:products')
+        .onPostgresChanges(
+            event: PostgresChangeEvent.all,
+            schema: 'public',
+            table: 'products',
+            callback: (payload) {
+              fetchFoods();
+            })
+        .subscribe();
   }
 
   @override
@@ -490,16 +542,14 @@ class _AdminFoodCardsState extends State<AdminFoodCards> {
       itemCount: foods.length,
       itemBuilder: (context, index) {
         return InkWell(
-          onTap: () {
-            Navigator.push(context, 
-              MaterialPageRoute(builder: (_) => EditFoodTemplate(food: foods[index]))
-            );
-          },
-          child: AdminFoodCard(
-            key: ValueKey(foods[index].id),
-            food: foods[index]
-          )
-        );
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => EditFoodTemplate(food: foods[index])));
+            },
+            child: AdminFoodCard(
+                key: ValueKey(foods[index].id), food: foods[index]));
       },
     );
   }
@@ -509,10 +559,10 @@ class AdminFoodCard extends StatelessWidget {
   final Food food;
 
   const AdminFoodCard({
-    required this.food, 
+    required this.food,
     Key? key,
   }) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -537,7 +587,7 @@ class AdminFoodCard extends StatelessWidget {
             child: SizedBox(
               height: imageHeight,
               child: Image.network(
-                food.imageUrl ?? '', 
+                food.imageUrl ?? '',
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
@@ -553,12 +603,17 @@ class AdminFoodCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                 Text(
+                Text(
                   food.product_name,
-                  style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: titleFontSize),
+                  style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w700,
+                      fontSize: titleFontSize),
                 ),
-                Text(food.availability? 'Available' : 'Unavailable',
-                  style: TextStyle(fontFamily: 'Inter', fontSize: subtitleFontSize),
+                Text(
+                  food.availability ? 'Available' : 'Unavailable',
+                  style: TextStyle(
+                      fontFamily: 'Inter', fontSize: subtitleFontSize),
                 ),
               ],
             ),
@@ -597,9 +652,9 @@ class _CustomerFoodCardsState extends State<CustomerFoodCards> {
   Future<void> fetchFoods() async {
     try {
       final response = await Supabase.instance.client
-        .from('products')
-        .select('*')
-        .order('created_at', ascending: false);
+          .from('products')
+          .select('*')
+          .order('created_at', ascending: false);
 
       print('Supabase response: $response');
 
@@ -617,15 +672,15 @@ class _CustomerFoodCardsState extends State<CustomerFoodCards> {
 
   void setupRealtimeListener() {
     _channel = Supabase.instance.client
-      .channel('public:products')
-      .onPostgresChanges(
-        event: PostgresChangeEvent.all, 
-        schema: 'public',
-        table: 'products',
-        callback: (payload) {
-          fetchFoods();
-        })
-      .subscribe();
+        .channel('public:products')
+        .onPostgresChanges(
+            event: PostgresChangeEvent.all,
+            schema: 'public',
+            table: 'products',
+            callback: (payload) {
+              fetchFoods();
+            })
+        .subscribe();
   }
 
   @override
@@ -641,17 +696,16 @@ class _CustomerFoodCardsState extends State<CustomerFoodCards> {
       itemCount: foods.length,
       itemBuilder: (context, index) {
         return InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => CustomerFoodTemplate(food: foods[index]))
-            );
-          },
-          child: CustomerFoodCard(
-            key: ValueKey(foods[index].id),
-            food: foods[index])
-        );
+            borderRadius: BorderRadius.circular(12),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          CustomerFoodTemplate(food: foods[index])));
+            },
+            child: CustomerFoodCard(
+                key: ValueKey(foods[index].id), food: foods[index]));
       },
     );
   }
@@ -661,10 +715,10 @@ class CustomerFoodCard extends StatefulWidget {
   final Food food;
 
   const CustomerFoodCard({
-    required this.food, 
+    required this.food,
     Key? key,
   }) : super(key: key);
-  
+
   @override
   State<CustomerFoodCard> createState() => _CustomerFoodCardState();
 }
@@ -694,7 +748,7 @@ class _CustomerFoodCardState extends State<CustomerFoodCard> {
             child: SizedBox(
               height: imageHeight,
               child: Image.network(
-                widget.food.imageUrl ?? '', 
+                widget.food.imageUrl ?? '',
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
@@ -712,10 +766,15 @@ class _CustomerFoodCardState extends State<CustomerFoodCard> {
               children: [
                 Text(
                   widget.food.product_name,
-                  style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: titleFontSize),
+                  style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w700,
+                      fontSize: titleFontSize),
                 ),
-                Text(widget.food.price.toString(),
-                  style: TextStyle(fontFamily: 'Inter', fontSize: subtitleFontSize),
+                Text(
+                  widget.food.price.toString(),
+                  style: TextStyle(
+                      fontFamily: 'Inter', fontSize: subtitleFontSize),
                 ),
               ],
             ),
@@ -725,7 +784,6 @@ class _CustomerFoodCardState extends State<CustomerFoodCard> {
     );
   }
 }
-
 
 // FOUND IN ad_OrdersTab
 // FOUND IN ad_OrdersTab
@@ -751,17 +809,15 @@ class AdminOrdersCard extends StatefulWidget {
   final Category category;
 
   const AdminOrdersCard({
-    required this.category, 
+    required this.category,
     Key? key,
   }) : super(key: key);
-  
+
   @override
   State<AdminOrdersCard> createState() => _AdminOrdersCardState();
 }
 
 class _AdminOrdersCardState extends State<AdminOrdersCard> {
-  
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -779,7 +835,7 @@ class _AdminOrdersCardState extends State<AdminOrdersCard> {
         onTap: () {},
         child: Container(
           width: double.infinity,
-          padding: EdgeInsets.fromLTRB(2,2,8,2),
+          padding: EdgeInsets.fromLTRB(2, 2, 8, 2),
           margin: EdgeInsets.zero,
           child: Row(
             children: [
@@ -791,64 +847,74 @@ class _AdminOrdersCardState extends State<AdminOrdersCard> {
                 ),
               ),
               Expanded(
-                child: 
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(0, 4, 0, 0),
-                    child: Text(widget.category.name, style: TextStyle(fontSize: titleFontSize)),
-                  ),
-                  Padding(    
-                    padding: EdgeInsets.fromLTRB(0, 0, 0, 7),
-                    child: Text(widget.category.status, style: TextStyle(fontSize: descriptionFontSize)),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: 
-                      SizedBox(
-                        height: sizedboxHeight,
-                        child:
-                      ElevatedButton(onPressed: () {}, child: Text('Accept', style: TextStyle(fontSize: buttonFontSize)), 
-                        style: ButtonStyle(
-                          padding: MaterialStateProperty.all(EdgeInsets.all(0)),
-                          shape: MaterialStateProperty.all(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                            ),
-                          backgroundColor: MaterialStateProperty.all(c_pri_yellow),  
-                          foregroundColor: MaterialStateProperty.all(c_white),                        
-                          )),
-                      ),
-                      ),
-                      SizedBox(width: 6),
-                      Expanded(
-                        child: 
-                      SizedBox(
-                        height: sizedboxHeight,
-                        child: 
-                      ElevatedButton(onPressed: () {}, child: Text('Deny', style: TextStyle(fontSize: buttonFontSize),), 
-                        style: ButtonStyle(
-                          padding: MaterialStateProperty.all(EdgeInsets.all(0)),
-                          shape: MaterialStateProperty.all(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                            ),
-                          backgroundColor: MaterialStateProperty.all(c_sec_yellow),  
-                          foregroundColor: MaterialStateProperty.all(c_white),                        
-                          )
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 4, 0, 0),
+                      child: Text(widget.category.name,
+                          style: TextStyle(fontSize: titleFontSize)),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 0, 0, 7),
+                      child: Text(widget.category.status,
+                          style: TextStyle(fontSize: descriptionFontSize)),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: SizedBox(
+                            height: sizedboxHeight,
+                            child: ElevatedButton(
+                                onPressed: () {},
+                                child: Text('Accept',
+                                    style: TextStyle(fontSize: buttonFontSize)),
+                                style: ButtonStyle(
+                                  padding: MaterialStateProperty.all(
+                                      EdgeInsets.all(0)),
+                                  shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                  backgroundColor:
+                                      MaterialStateProperty.all(c_pri_yellow),
+                                  foregroundColor:
+                                      MaterialStateProperty.all(c_white),
+                                )),
+                          ),
                         ),
-                      ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                        SizedBox(width: 6),
+                        Expanded(
+                          child: SizedBox(
+                            height: sizedboxHeight,
+                            child: ElevatedButton(
+                                onPressed: () {},
+                                child: Text(
+                                  'Deny',
+                                  style: TextStyle(fontSize: buttonFontSize),
+                                ),
+                                style: ButtonStyle(
+                                  padding: MaterialStateProperty.all(
+                                      EdgeInsets.all(0)),
+                                  shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                  backgroundColor:
+                                      MaterialStateProperty.all(c_sec_yellow),
+                                  foregroundColor:
+                                      MaterialStateProperty.all(c_white),
+                                )),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -856,7 +922,7 @@ class _AdminOrdersCardState extends State<AdminOrdersCard> {
       ),
     );
   }
-} 
+}
 
 // SAMPLE STATUS INPUTS
 // SAMPLE STATUS INPUTS
@@ -870,10 +936,9 @@ final List<Status> _statuses = [
 
 class Status {
   final String statusName;
-  
+
   Status({required this.statusName});
 }
-
 
 // FOUND IN ad_OrdersTab
 // FOUND IN ad_OrdersTab
@@ -883,7 +948,6 @@ class OrderStatusCards extends StatelessWidget {
     return ListView.builder(
       scrollDirection: Axis.horizontal,
       itemCount: _statuses.length,
-     
       itemBuilder: (context, index) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -898,10 +962,10 @@ class OrderStatusCard extends StatefulWidget {
   final Status status;
 
   const OrderStatusCard({
-    required this.status, 
+    required this.status,
     Key? key,
   }) : super(key: key);
-  
+
   @override
   State<OrderStatusCard> createState() => _OrderStatusCardState();
 }
@@ -919,7 +983,6 @@ class _OrderStatusCardState extends State<OrderStatusCard> {
   }
 }
 
-
 // NAMED cust_Cart && FOUND IN cust_HomeTab & cust_OrdersTab
 // NAMED cust_Cart && FOUND IN cust_HomeTab & cust_OrdersTab
 class CartCards extends StatefulWidget {
@@ -933,7 +996,7 @@ class _CartCardsState extends State<CartCards> {
   bool isLoading = true;
   RealtimeChannel? _channel;
 
-  @override 
+  @override
   void initState() {
     super.initState();
     fetchCartItems();
@@ -958,9 +1021,9 @@ class _CartCardsState extends State<CartCards> {
       }
 
       final response = await Supabase.instance.client
-        .from('cart_items')
-        .select('*, products(*)')
-        .eq('cust_id', userId);
+          .from('cart_items')
+          .select('*, products(*)')
+          .eq('cust_id', userId);
 
       setState(() {
         cartItems = List<Map<String, dynamic>>.from(response);
@@ -973,31 +1036,29 @@ class _CartCardsState extends State<CartCards> {
       });
     }
   }
-  
+
   void setupRealtimeListener() {
     _channel = Supabase.instance.client
-      .channel('public:cart_items')
-      .onPostgresChanges(
-        event: PostgresChangeEvent.all, 
-        schema: 'public',
-        table: 'cart_items',
-        callback: (payload) {
-          fetchCartItems();
-        })
-      .subscribe();
+        .channel('public:cart_items')
+        .onPostgresChanges(
+            event: PostgresChangeEvent.all,
+            schema: 'public',
+            table: 'cart_items',
+            callback: (payload) {
+              fetchCartItems();
+            })
+        .subscribe();
   }
-  
+
   Future<void> updateCartItemQuantity(int cartItemId, int newQuantity) async {
     try {
       await Supabase.instance.client
-        .from('cart_items')
-        .update({'quantity': newQuantity})
-        .eq('id', cartItemId);
+          .from('cart_items')
+          .update({'quantity': newQuantity}).eq('id', cartItemId);
     } catch (e) {
       print('Error updating cart item quantity: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update quantity: ${e.toString()}'))
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Failed to update quantity: ${e.toString()}')));
     }
   }
 
@@ -1016,27 +1077,27 @@ class _CartCardsState extends State<CartCards> {
     if (isLoading) {
       return Center(child: CircularProgressIndicator());
     }
-    return GridView.builder(gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 1,
-      childAspectRatio: 3,
-    ), 
-    padding: EdgeInsets.symmetric(horizontal: 8),
-    itemCount: cartItems.length,
-    itemBuilder: (context, index) {
-      final cartItem = cartItems[index];
-      final food = Food.fromJson(cartItem['products']);
-      final cartItemId = cartItem['id'] as int;
-      return CartCard(
-        key: ValueKey(cartItemId),
-        food: food,
-        cartItemId: cartItemId,
-        quantity: cartItem['quantity'],
-        onQuantityChanged: updateCartItemQuantity,
-        isSelected: selectedCartItemIds.contains(cartItemId),
-        onSelected: () => toggleSelection(cartItemId),
-      );
-    }
-    );
+    return GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 1,
+          childAspectRatio: 3,
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 8),
+        itemCount: cartItems.length,
+        itemBuilder: (context, index) {
+          final cartItem = cartItems[index];
+          final food = Food.fromJson(cartItem['products']);
+          final cartItemId = cartItem['id'] as int;
+          return CartCard(
+            key: ValueKey(cartItemId),
+            food: food,
+            cartItemId: cartItemId,
+            quantity: cartItem['quantity'],
+            onQuantityChanged: updateCartItemQuantity,
+            isSelected: selectedCartItemIds.contains(cartItemId),
+            onSelected: () => toggleSelection(cartItemId),
+          );
+        });
   }
 }
 
@@ -1057,7 +1118,7 @@ class CartCard extends StatelessWidget {
     required this.onSelected,
     Key? key,
   }) : super(key: key);
-   
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -1102,11 +1163,13 @@ class CartCard extends StatelessWidget {
                     children: [
                       Text(
                         food.product_name,
-                        style: TextStyle(fontFamily: 'Inter', fontSize: titleFontSize),
+                        style: TextStyle(
+                            fontFamily: 'Inter', fontSize: titleFontSize),
                       ),
                       Text(
                         'P${food.price.toString()}',
-                        style: TextStyle(fontFamily: 'Inter', fontSize: subtitleFontSize),
+                        style: TextStyle(
+                            fontFamily: 'Inter', fontSize: subtitleFontSize),
                       ),
                     ],
                   ),
@@ -1115,7 +1178,8 @@ class CartCard extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: EdgeInsets.fromLTRB(0, 4, 4, 4), // Add the required padding
+            padding:
+                EdgeInsets.fromLTRB(0, 4, 4, 4), // Add the required padding
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -1127,11 +1191,10 @@ class CartCard extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 0, 8, 4),
                   child: AddRemoveButton(
-                    initialValue: quantity,
-                    onChanged: (int value) {
-                      onQuantityChanged(cartItemId, value);
-                    }
-                  ),
+                      initialValue: quantity,
+                      onChanged: (int value) {
+                        onQuantityChanged(cartItemId, value);
+                      }),
                 ),
               ],
             ),
@@ -1142,23 +1205,21 @@ class CartCard extends StatelessWidget {
   }
 }
 
-
 // NAMED cust_Checkout && FOUND AFTER cust_Cart via Button
 // NAMED cust_Checkout && FOUND AFTER cust_Cart via Button
 class CheckoutCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 1,
-      childAspectRatio: 3,
-
-      ), 
-      padding: EdgeInsets.symmetric(horizontal: 8),
-      itemCount: _categories.length,
-      itemBuilder: (context, index) {
-        return CheckoutCard(category: _categories[index], index: index);
-      }
-    );
+    return GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 1,
+          childAspectRatio: 3,
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 8),
+        itemCount: _categories.length,
+        itemBuilder: (context, index) {
+          return CheckoutCard(category: _categories[index], index: index);
+        });
   }
 }
 
@@ -1167,11 +1228,11 @@ class CheckoutCard extends StatefulWidget {
   final int index;
 
   const CheckoutCard({
-    required this.category, 
+    required this.category,
     required this.index,
     Key? key,
   }) : super(key: key);
-   
+
   @override
   State<CheckoutCard> createState() => _CheckoutCardState();
 }
@@ -1183,15 +1244,15 @@ class _CheckoutCardState extends State<CheckoutCard> {
     double imageWidth = screenWidth * 0.25;
     double titleFontSize = screenWidth * 0.045;
     double subtitleFontSize = screenWidth * 0.04;
- 
+
     bool isAllSelected = false;
 
     void toggleSelection() {
       setState(() {
-        _categories[widget.index].isSelected = !_categories[widget.index].isSelected;
+        _categories[widget.index].isSelected =
+            !_categories[widget.index].isSelected;
         isAllSelected = _categories.every((category) => category.isSelected);
-      }
-      );
+      });
     }
 
     return Card(
@@ -1201,8 +1262,10 @@ class _CheckoutCardState extends State<CheckoutCard> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Padding(
-            padding: EdgeInsets.fromLTRB(4, 2, 0, 2), // Add the required padding
-            child: Row(// Image container
+            padding:
+                EdgeInsets.fromLTRB(4, 2, 0, 2), // Add the required padding
+            child: Row(
+              // Image container
               children: [
                 Card(
                   shape: RoundedRectangleBorder(
@@ -1225,11 +1288,13 @@ class _CheckoutCardState extends State<CheckoutCard> {
                     children: [
                       Text(
                         widget.category.name,
-                        style: TextStyle(fontFamily: 'Inter', fontSize: titleFontSize),
+                        style: TextStyle(
+                            fontFamily: 'Inter', fontSize: titleFontSize),
                       ),
                       Text(
                         widget.category.detail,
-                        style: TextStyle(fontFamily: 'Inter', fontSize: subtitleFontSize),
+                        style: TextStyle(
+                            fontFamily: 'Inter', fontSize: subtitleFontSize),
                       ),
                     ],
                   ),
@@ -1238,13 +1303,18 @@ class _CheckoutCardState extends State<CheckoutCard> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.fromLTRB(0, 12, 12, 8), // Add the required padding
+            padding:
+                EdgeInsets.fromLTRB(0, 12, 12, 8), // Add the required padding
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text('x1', style: TextStyle(fontFamily: 'Inter', fontSize: subtitleFontSize)),
-                Text('P100', style: TextStyle(fontFamily: 'Inter', fontSize: titleFontSize)),
+                Text('x1',
+                    style: TextStyle(
+                        fontFamily: 'Inter', fontSize: subtitleFontSize)),
+                Text('P100',
+                    style: TextStyle(
+                        fontFamily: 'Inter', fontSize: titleFontSize)),
               ],
             ),
           ),
@@ -1252,5 +1322,4 @@ class _CheckoutCardState extends State<CheckoutCard> {
       ),
     );
   }
-} 
-
+}
