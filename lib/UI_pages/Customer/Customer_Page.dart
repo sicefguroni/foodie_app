@@ -17,7 +17,7 @@ class CustomerPageStates extends State<CustomerPage> {
     CustomerOrdersTab(),
   ];
 
-  @override 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: pages[_currentIndex],
@@ -44,7 +44,3 @@ class CustomerPageStates extends State<CustomerPage> {
     );
   }
 }
-
-
-
-
