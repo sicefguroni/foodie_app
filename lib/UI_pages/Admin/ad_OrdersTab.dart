@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:foodie_app/Utilities/color_palette.dart';
-import 'package:foodie_app/UI_pages/Templates/account_Profile.dart';
 import '../../Utilities/utilities_cards.dart';
 import '../../Utilities/utilities_buttons.dart';
 import '../../Utilities/utilities_others.dart';
+import 'ad_ProfilePage.dart';
 
 class AdminOrdersTab extends StatelessWidget {
   @override
@@ -31,7 +31,7 @@ class AdminOrdersTab extends StatelessWidget {
               ),
               rightmost: ProfileButton(iconColor: c_pri_yellow, 
                 onPressed: () {
-                  return ProfilePage();
+                  return AdminProfilePage();
                 },
               ),
             ),
