@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodie_app/Utilities/color_palette.dart';
-import 'package:foodie_app/UI_pages/Templates/account_Profile.dart';
+import 'cust_ProfilePage.dart';
 import 'cust_Cart.dart';
 import '../../Utilities/utilities_cards.dart';
 import '../../Utilities/utilities_buttons.dart';
@@ -28,7 +28,7 @@ class CustomerOrdersTab extends StatelessWidget {
               rightmost: ProfileButton(
                 iconColor: c_pri_yellow, 
                 onPressed: () {
-                  return ProfilePage();
+                  return CustomerProfilePage();
                 }
               ),
             ),

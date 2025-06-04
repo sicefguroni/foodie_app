@@ -29,7 +29,8 @@ class AdminOrdersTab extends StatelessWidget {
                 icon: Icon(Icons.notifications),
                 color: c_pri_yellow,
               ),
-              rightmost: ProfileButton(iconColor: c_pri_yellow, 
+              rightmost: ProfileButton(
+                iconColor: c_pri_yellow,
                 onPressed: () {
                   return AdminProfilePage();
                 },
@@ -37,7 +38,8 @@ class AdminOrdersTab extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 0, 0),
-              child: Text('Customer Orders', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              child: Text('Customer Orders',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             ),
             // Vertical scrolling grid that takes remaining space
             Expanded(
