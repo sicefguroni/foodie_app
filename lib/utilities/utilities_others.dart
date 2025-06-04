@@ -509,36 +509,42 @@ class CustomSearchBar extends StatelessWidget {
 }
 
 class CustomTabBar extends StatelessWidget {
+  final List<String> tabLabels;
+  final List<Widget> tabContents;
+  final double fontSize;
+  final Color indicatorColor;
+  final Color textColor;
+
+  const CustomTabBar({
+    super.key,
+    required this.tabLabels,
+    required this.tabContents,
+    this.fontSize = 12,
+    this.indicatorColor = c_pri_yellow,
+    this.textColor = Colors.black,
+  });
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 5,
+      length: tabLabels.length,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TabBar(
             labelPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             isScrollable: true,
-            indicatorColor: c_pri_yellow,
+            indicatorColor: indicatorColor,
             tabAlignment: TabAlignment.start,
+            labelColor: textColor,
             splashBorderRadius: BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8)),
-            tabs: [
-              Text('Pending', style: TextStyle(fontSize: 12)),
-              Text('Accepted', style: TextStyle(fontSize: 12)),
-              Text('Preparing', style: TextStyle(fontSize: 12)),
-              Text('To Deliver', style: TextStyle(fontSize: 12)),
-              Text('Completed', style: TextStyle(fontSize: 12)),
-            ],
+            tabs: tabLabels.map((label) => 
+              Text(label, style: TextStyle(fontSize: fontSize))
+            ).toList(),
           ),
           Expanded(
             child: TabBarView(
-              children: [
-                CheckoutCards(),
-                CheckoutCards(),
-                CheckoutCards(),
-                CheckoutCards(),
-                CheckoutCards(),
-              ],
+              children: tabContents,
             ),
           ),
         ],

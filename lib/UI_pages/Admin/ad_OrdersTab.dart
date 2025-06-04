@@ -3,6 +3,7 @@ import 'package:foodie_app/Utilities/color_palette.dart';
 import 'package:foodie_app/UI_pages/Templates/account_Profile.dart';
 import '../../Utilities/utilities_cards.dart';
 import '../../Utilities/utilities_buttons.dart';
+import '../../Utilities/utilities_others.dart';
 
 class AdminOrdersTab extends StatelessWidget {
   @override
@@ -35,22 +36,20 @@ class AdminOrdersTab extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 0, 0, 4),
-              child: Text('Status', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            ),
-            // Horizontal scrolling cards with fixed height
-            Container(
-              height: 35,
-              padding: EdgeInsets.fromLTRB(8, 0, 0, 0),
-              child: OrderStatusCards(),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 4, 0, 4),
+              padding: const EdgeInsets.fromLTRB(12, 0, 0, 0),
               child: Text('Customer Orders', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             ),
             // Vertical scrolling grid that takes remaining space
             Expanded(
-              child: AdminOrdersCards(),
+              child: CustomTabBar(
+                tabLabels: ['Pending', 'Accepted', 'To Deliver', 'Completed'],
+                tabContents: [
+                  AdminOrdersCards(),
+                  AdminOrdersCards(),
+                  AdminOrdersCards(),
+                  AdminOrdersCards(),
+                ],
+              ),
             ),
           ],
         ),

@@ -69,7 +69,7 @@ class _AddFoodTemplateState extends State<AddFoodTemplate> {
         'product_name': name,
         'description': desc,
         'category': _selectedCategory?.categoryName,
-        'image_url': _imageUr
+        'image_url': _imageUrl,
         'price': price,
         'quantity': quantity,
         'availability': true,

@@ -9,6 +9,7 @@ import '../UI_pages/Schemas/Ingredient.dart';
 import '../UI_pages/Schemas/Food.dart';
 import '../UI_pages/Templates/AddIngredient_Form.dart';
 import '../UI_pages/Templates/AddFood_Form.dart';
+import 'package:foodie_app/UI_pages/Templates/cust_food_Order.dart';
 
 // SAMPLE CARD INPUTS
 // SAMPLE CARD INPUTS
@@ -570,83 +571,160 @@ class AdminFoodCard extends StatelessWidget {
 
 // FOUND IN cust_HomeTab
 // FOUND IN cust_HomeTab
-// class CustomerFoodCards extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return GridView.builder(
-//       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-//         crossAxisCount: 2,
-//         childAspectRatio: .9,
-//         crossAxisSpacing: 8,
-//         mainAxisSpacing: 8,
-//       ),
-//       padding: EdgeInsets.all(8),
-//       itemCount: _categories.length,
-//       itemBuilder: (context, index) {
-//         return AdminFoodCard(category: _categories[index]);
-//       },
-//     );
-//   }
-// }
+class CustomerFoodCards extends StatefulWidget {
+  @override
+  State<CustomerFoodCards> createState() => _CustomerFoodCardsState();
+}
 
-// class CustomerFoodCard extends StatefulWidget {
-//   final Category category;
+class _CustomerFoodCardsState extends State<CustomerFoodCards> {
+  List<Food> foods = [];
+  bool isLoading = true;
+  RealtimeChannel? _channel;
 
-//   const CustomerFoodCard({
-//     required this.category, 
-//     Key? key,
-//   }) : super(key: key);
+  @override
+  void initState() {
+    super.initState();
+    fetchFoods();
+    setupRealtimeListener();
+  }
+
+  @override
+  void dispose() {
+    _channel?.unsubscribe();
+    super.dispose();
+  }
+
+  Future<void> fetchFoods() async {
+    try {
+      final response = await Supabase.instance.client
+        .from('products')
+        .select('*')
+        .order('created_at', ascending: false);
+
+      print('Supabase response: $response');
+
+      setState(() {
+        foods = response.map<Food>((json) => Food.fromJson(json)).toList();
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error fetching food: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void setupRealtimeListener() {
+    _channel = Supabase.instance.client
+      .channel('public:products')
+      .onPostgresChanges(
+        event: PostgresChangeEvent.all, 
+        schema: 'public',
+        table: 'products',
+        callback: (payload) {
+          fetchFoods();
+        })
+      .subscribe();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: .9,
+        crossAxisSpacing: 4,
+        mainAxisSpacing: 8,
+      ),
+      padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
+      itemCount: foods.length,
+      itemBuilder: (context, index) {
+        return InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => CustomerFoodTemplate(food: foods[index]))
+            );
+          },
+          child: CustomerFoodCard(
+            key: ValueKey(foods[index].id),
+            food: foods[index])
+        );
+      },
+    );
+  }
+}
+
+class CustomerFoodCard extends StatefulWidget {
+  final Food food;
+
+  const CustomerFoodCard({
+    required this.food, 
+    Key? key,
+  }) : super(key: key);
   
-//   @override
-//   State<CustomerFoodCard> createState() => _CustomerFoodCardState();
-// }
+  @override
+  State<CustomerFoodCard> createState() => _CustomerFoodCardState();
+}
 
-// class _CustomerFoodCardState extends State<CustomerFoodCard> {
-//   @override
-//   Widget build(BuildContext context) {
-//     double screenWidth = MediaQuery.of(context).size.width;
-//     double titleFontSize = screenWidth * 0.04;
-//     double subtitleFontSize = screenWidth * 0.04;
+class _CustomerFoodCardState extends State<CustomerFoodCard> {
+  @override
+  Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+    double imageHeight = screenHeight * 0.14;
+    double titleFontSize = screenWidth * 0.045;
+    double subtitleFontSize = screenWidth * 0.04;
 
-//     return Card(
-//       elevation: 2,
-//       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-//       child: InkWell(
-//         borderRadius: BorderRadius.circular(12),
-//         onTap: () {
-//           Navigator.push(
-//             context,
-//             MaterialPageRoute(builder: (context) => CustomerFoodTemplate())
-//           );
-//         },
-//           child: Column(
-//             crossAxisAlignment: CrossAxisAlignment.stretch,
-//             children: [
-//               Expanded(
-//                 child: Image.asset(widget.category.assetName, fit: BoxFit.cover),
-//               ),
-//               Padding(
-//                 padding: EdgeInsets.fromLTRB(8, 4, 0, 4),
-//                 child: Column(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                      Text(
-//                       widget.category.name,
-//                       style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: titleFontSize),
-//                     ),
-//                     Text(
-//                       widget.category.status,
-//                       style: TextStyle(fontFamily: 'Inter', fontSize: subtitleFontSize),
-//                     ),
-//                   ],
-//                 ),
-//               )
-//             ],
-//           ),
-//       ),
-//     );
-//   }
-// }
+    return Card(
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Card(
+            margin: EdgeInsets.all(4),
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadiusGeometry.circular(8),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: SizedBox(
+              height: imageHeight,
+              child: Image.network(
+                widget.food.imageUrl ?? '', 
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.grey[300],
+                    child: Icon(Icons.image_not_supported),
+                  );
+                },
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(8, 0, 0, 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.food.product_name,
+                  style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: titleFontSize),
+                ),
+                Text(widget.food.price.toString(),
+                  style: TextStyle(fontFamily: 'Inter', fontSize: subtitleFontSize),
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
 
 
 // FOUND IN ad_OrdersTab
@@ -844,63 +922,148 @@ class _OrderStatusCardState extends State<OrderStatusCard> {
 
 // NAMED cust_Cart && FOUND IN cust_HomeTab & cust_OrdersTab
 // NAMED cust_Cart && FOUND IN cust_HomeTab & cust_OrdersTab
-class CartCards extends StatelessWidget {
+class CartCards extends StatefulWidget {
+  @override
+  State<CartCards> createState() => _CartCardsState();
+}
+
+class _CartCardsState extends State<CartCards> {
+  List<Map<String, dynamic>> cartItems = [];
+  Set<int> selectedCartItemIds = {}; // Track selected cart item IDs
+  bool isLoading = true;
+  RealtimeChannel? _channel;
+
+  @override 
+  void initState() {
+    super.initState();
+    fetchCartItems();
+    setupRealtimeListener();
+  }
+
+  @override
+  void dispose() {
+    _channel?.unsubscribe();
+    super.dispose();
+  }
+
+  Future<void> fetchCartItems() async {
+    try {
+      final userId = Supabase.instance.client.auth.currentUser?.id;
+      if (userId == null) {
+        setState(() {
+          cartItems = [];
+          isLoading = false;
+        });
+        return;
+      }
+
+      final response = await Supabase.instance.client
+        .from('cart_items')
+        .select('*, products(*)')
+        .eq('cust_id', userId);
+
+      setState(() {
+        cartItems = List<Map<String, dynamic>>.from(response);
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error fetching cart items: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+  
+  void setupRealtimeListener() {
+    _channel = Supabase.instance.client
+      .channel('public:cart_items')
+      .onPostgresChanges(
+        event: PostgresChangeEvent.all, 
+        schema: 'public',
+        table: 'cart_items',
+        callback: (payload) {
+          fetchCartItems();
+        })
+      .subscribe();
+  }
+  
+  Future<void> updateCartItemQuantity(int cartItemId, int newQuantity) async {
+    try {
+      await Supabase.instance.client
+        .from('cart_items')
+        .update({'quantity': newQuantity})
+        .eq('id', cartItemId);
+    } catch (e) {
+      print('Error updating cart item quantity: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update quantity: ${e.toString()}'))
+      );
+    }
+  }
+
+  void toggleSelection(int cartItemId) {
+    setState(() {
+      if (selectedCartItemIds.contains(cartItemId)) {
+        selectedCartItemIds.remove(cartItemId);
+      } else {
+        selectedCartItemIds.add(cartItemId);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
     return GridView.builder(gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
       crossAxisCount: 1,
       childAspectRatio: 3,
-
-      ), 
-      padding: EdgeInsets.symmetric(horizontal: 8),
-      itemCount: _categories.length,
-      itemBuilder: (context, index) {
-        return CartCard(category: _categories[index], index: index);
-      }
+    ), 
+    padding: EdgeInsets.symmetric(horizontal: 8),
+    itemCount: cartItems.length,
+    itemBuilder: (context, index) {
+      final cartItem = cartItems[index];
+      final food = Food.fromJson(cartItem['products']);
+      final cartItemId = cartItem['id'] as int;
+      return CartCard(
+        key: ValueKey(cartItemId),
+        food: food,
+        cartItemId: cartItemId,
+        quantity: cartItem['quantity'],
+        onQuantityChanged: updateCartItemQuantity,
+        isSelected: selectedCartItemIds.contains(cartItemId),
+        onSelected: () => toggleSelection(cartItemId),
+      );
+    }
     );
   }
 }
 
-class CartCard extends StatefulWidget {
-  final Category category;
-  final int index;
+class CartCard extends StatelessWidget {
+  final Food food;
+  final int cartItemId;
+  final int quantity;
+  final Function(int, int) onQuantityChanged;
+  final bool isSelected;
+  final VoidCallback onSelected;
 
   const CartCard({
-    required this.category, 
-    required this.index,
+    required this.food,
+    required this.cartItemId,
+    required this.quantity,
+    required this.onQuantityChanged,
+    required this.isSelected,
+    required this.onSelected,
     Key? key,
   }) : super(key: key);
    
-  @override
-  State<CartCard> createState() => _CartCardState();
-}
-
-class _CartCardState extends State<CartCard> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double imageWidth = screenWidth * 0.25;
     double titleFontSize = screenWidth * 0.045;
     double subtitleFontSize = screenWidth * 0.04;
-
-    bool isAllSelected = false;
-
-    void toggleSelectAll() {
-    setState(() {
-      isAllSelected = !isAllSelected;
-      for (var category in _categories) {
-        category.isSelected = isAllSelected;
-      }
-      });
-    }
-
-    void toggleSelection() {
-      setState(() {
-        _categories[widget.index].isSelected = !_categories[widget.index].isSelected;
-        isAllSelected = _categories.every((category) => category.isSelected);
-      }
-      );
-    }
 
     return Card(
       elevation: 1,
@@ -909,8 +1072,8 @@ class _CartCardState extends State<CartCard> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Padding(
-            padding: EdgeInsets.fromLTRB(4, 2, 0, 2), // Add the required padding
-            child: Row(// Image container
+            padding: EdgeInsets.fromLTRB(4, 2, 0, 2),
+            child: Row(
               children: [
                 Card(
                   shape: RoundedRectangleBorder(
@@ -919,9 +1082,15 @@ class _CartCardState extends State<CartCard> {
                   clipBehavior: Clip.antiAlias,
                   child: SizedBox(
                     width: imageWidth,
-                    child: Image.asset(
-                      widget.category.assetName,
+                    child: Image.network(
+                      food.imageUrl ?? '',
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey[300],
+                          child: Icon(Icons.image_not_supported),
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -932,11 +1101,11 @@ class _CartCardState extends State<CartCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.category.name,
+                        food.product_name,
                         style: TextStyle(fontFamily: 'Inter', fontSize: titleFontSize),
                       ),
                       Text(
-                        widget.category.detail,
+                        'P${food.price.toString()}',
                         style: TextStyle(fontFamily: 'Inter', fontSize: subtitleFontSize),
                       ),
                     ],
@@ -951,10 +1120,18 @@ class _CartCardState extends State<CartCard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Checkbox(value: widget.category.isSelected, onChanged: (_) => toggleSelection()),
+                Checkbox(
+                  value: isSelected,
+                  onChanged: (_) => onSelected(),
+                ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 0, 8, 4),
-                  child: AddRemoveButton(onChanged: (int ) {  },),
+                  child: AddRemoveButton(
+                    initialValue: quantity,
+                    onChanged: (int value) {
+                      onQuantityChanged(cartItemId, value);
+                    }
+                  ),
                 ),
               ],
             ),
@@ -963,7 +1140,7 @@ class _CartCardState extends State<CartCard> {
       ),
     );
   }
-} 
+}
 
 
 // NAMED cust_Checkout && FOUND AFTER cust_Cart via Button
