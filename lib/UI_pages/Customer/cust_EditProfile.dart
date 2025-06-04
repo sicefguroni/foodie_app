@@ -181,7 +181,7 @@ class _CustomerEditProfileState extends State<CustomerEditProfile> {
                                     });
                                   },
                                 ),
-                              ),
+                              )
                             ),
                         ],
                       ),

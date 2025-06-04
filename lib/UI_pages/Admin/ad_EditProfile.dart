@@ -186,15 +186,6 @@ class _AdminEditProfileState extends State<AdminEditProfile> {
                         ],
                       ),
                       SizedBox(height: 12),
-                      ImageUploader(
-                        initialImageUrl: _imageUrl,
-                        onImageUploaded: (url) {
-                          setState(() {
-                            _imageUrl = url;
-                          });
-                        },
-                      ),
-                      SizedBox(height: 12),
                       buildTextField(
                           label: 'First Name',
                           controller: firstNameController,

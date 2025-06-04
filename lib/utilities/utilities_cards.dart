@@ -581,7 +581,7 @@ class AdminFoodCard extends StatelessWidget {
             margin: EdgeInsets.all(4),
             elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadiusGeometry.circular(8),
+              borderRadius: BorderRadius.circular(8),
             ),
             clipBehavior: Clip.antiAlias,
             child: SizedBox(
@@ -742,7 +742,7 @@ class _CustomerFoodCardState extends State<CustomerFoodCard> {
             margin: EdgeInsets.all(4),
             elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadiusGeometry.circular(8),
+              borderRadius: BorderRadius.circular(8),
             ),
             clipBehavior: Clip.antiAlias,
             child: SizedBox(
