@@ -18,7 +18,13 @@ class _AddIngredientTemplateState extends State<AddIngredientTemplate> {
   late int quantity;
   String? _imageUrl;
 
-  Future<void> _submit() async {
+  @override
+  void initState() {
+    super.initState();
+    _selectedCategory = ingredientCategories[0];
+  }
+
+  Future<void> _addIngredient() async {
 
     await Supabase.instance.client.from('ingredients').insert({
       'id': DateTime.now().millisecondsSinceEpoch,
@@ -46,6 +52,7 @@ class _AddIngredientTemplateState extends State<AddIngredientTemplate> {
             ),
             SizedBox(height: 8),
             ImageUploader(
+              bucketName: 'ingredient-images',
               onImageUploaded: (url) {
                 setState(() {
                   _imageUrl = url;
@@ -112,8 +119,11 @@ class _AddIngredientTemplateState extends State<AddIngredientTemplate> {
                               children: [
                                 bodyText(text: 'Category', color: c_pri_yellow),
                                 SizedBox(height: 4),
-                                DropdownMenuCategories(
-                                  onChanged: (value) {
+                                DropdownMenuCategories<DropdownCategory>(
+                                  items: ingredientCategories,
+                                  initialValue: _selectedCategory,
+                                  getLabel: (cat) => cat.categoryName,
+                                  onChanged: (DropdownCategory? value) {
                                     setState(() {
                                       _selectedCategory = value;
                                     });
@@ -145,7 +155,7 @@ class _AddIngredientTemplateState extends State<AddIngredientTemplate> {
                     ),
                     ActionButton(buttonName: 'Add Ingredient', backgroundColor: c_pri_yellow, 
                         onPressed: () { 
-                          _submit();
+                          _addIngredient();
                     },)
                   ],
                 ),
@@ -173,6 +183,7 @@ class _EditIngredientTemplateState extends State<EditIngredientTemplate> {
   late int quantity;
   String? _selectedCategory;
   String? _imageUrl;
+  late DropdownCategory matchedCategory;
 
   @override
   void initState() {
@@ -182,6 +193,10 @@ class _EditIngredientTemplateState extends State<EditIngredientTemplate> {
     quantity = widget.ingredient.quantity;
     _selectedCategory = widget.ingredient.category;
     _imageUrl = widget.ingredient.imageUrl;
+    matchedCategory = ingredientCategories.firstWhere(
+      (cat) => cat.categoryName == _selectedCategory,
+      orElse: () => ingredientCategories[0],
+    );
   }
   
   Future<void> updateIngredient() async {
@@ -213,6 +228,7 @@ class _EditIngredientTemplateState extends State<EditIngredientTemplate> {
             ),
             SizedBox(height: 8),
             ImageUploader(
+              bucketName: 'ingredient-images',
               initialImageUrl: _imageUrl,
               onImageUploaded: (url) {
                 setState(() {
@@ -280,8 +296,10 @@ class _EditIngredientTemplateState extends State<EditIngredientTemplate> {
                               children: [
                                 bodyText(text: 'Category', color: c_pri_yellow),
                                 SizedBox(height: 4),
-                                DropdownMenuCategories(
-                                  initialValue: _selectedCategory,
+                                DropdownMenuCategories<DropdownCategory>(
+                                  items: ingredientCategories,
+                                  initialValue: matchedCategory,
+                                  getLabel: (cat) => cat.categoryName,
                                   onChanged: (DropdownCategory? newValue) {
                                     setState(() {
                                       _selectedCategory = newValue?.categoryName;
@@ -301,7 +319,9 @@ class _EditIngredientTemplateState extends State<EditIngredientTemplate> {
                               bodyText(text: 'Quantity', color: c_pri_yellow),
                               Padding(
                                 padding: const EdgeInsets.only(top: 8.0),
-                                child: AddRemoveButton(onChanged: (_quantity) {
+                                child: AddRemoveButton(
+                                  initialValue: quantity,
+                                  onChanged: (_quantity) {
                                   setState(() {
                                     quantity = _quantity;
                                   });
