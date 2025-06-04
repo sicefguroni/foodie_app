@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:foodie_app/Utilities/color_palette.dart';
 import 'package:foodie_app/UI_pages/Templates/account_Profile.dart';
 import 'cust_Cart.dart';
+import '../../Utilities/utilities_cards.dart';
 import '../../Utilities/utilities_buttons.dart';
 import '../../Utilities/utilities_others.dart';
 
@@ -37,7 +38,15 @@ class CustomerOrdersTab extends StatelessWidget {
             ),
             // Horizontal scrolling cards with fixed height
             Expanded(
-              child: CustomTabBar(),
+              child: CustomTabBar(
+                tabLabels: ['Pending', 'Accepted', 'To Deliver', 'Completed'],
+                tabContents: [
+                  CheckoutCards(),
+                  CheckoutCards(),
+                  CheckoutCards(),
+                  CheckoutCards(),
+                ],
+              ),
             ),
           ],
         ),
