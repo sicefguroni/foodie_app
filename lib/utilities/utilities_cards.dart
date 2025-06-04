@@ -17,51 +17,23 @@ import '../UI_pages/Schemas/Order.dart';
 final List<Category> _categories = [
   Category(
       assetName: 'lib/images/opening-image.png',
-      name: 'Vegetables',
+      name: 'Mains',
       status: 'Available',
-      detail: 'By kilo',
       isSelected: false),
   Category(
       assetName: 'lib/images/opening-image.png',
-      name: 'Vegetables',
+      name: 'Appetizers',
       status: 'Available',
-      detail: 'By kilo',
       isSelected: false),
   Category(
       assetName: 'lib/images/opening-image.png',
-      name: 'Vegetables',
+      name: 'Pastries',
       status: 'Available',
-      detail: 'By kilo',
       isSelected: false),
   Category(
       assetName: 'lib/images/opening-image.png',
-      name: 'Vegetables',
+      name: 'Beverages',
       status: 'Available',
-      detail: 'By kilo',
-      isSelected: false),
-  Category(
-      assetName: 'lib/images/opening-image.png',
-      name: 'Vegetables',
-      status: 'Available',
-      detail: 'By kilo',
-      isSelected: false),
-  Category(
-      assetName: 'lib/images/opening-image.png',
-      name: 'Vegetables',
-      status: 'Available',
-      detail: 'By kilo',
-      isSelected: false),
-  Category(
-      assetName: 'lib/images/opening-image.png',
-      name: 'Vegetables',
-      status: 'Available',
-      detail: 'By kilo',
-      isSelected: false),
-  Category(
-      assetName: 'lib/images/opening-image.png',
-      name: 'Vegetables',
-      status: 'Available',
-      detail: 'By kilo',
       isSelected: false),
 ];
 
@@ -69,14 +41,47 @@ class Category {
   final String assetName;
   final String name;
   final String status;
-  final String detail;
   bool isSelected;
 
   Category(
       {required this.assetName,
       required this.name,
       required this.status,
-      required this.detail,
+      this.isSelected = false});
+}
+
+
+final List<IngredientsCategory> _ingredientCategories = [
+  IngredientsCategory(
+      assetName: 'lib/images/opening-image.png',
+      name: 'Vegetables',
+      isSelected: false),
+  IngredientsCategory(
+      assetName: 'lib/images/opening-image.png',
+      name: 'Protein',
+      isSelected: false),
+  IngredientsCategory(
+      assetName: 'lib/images/opening-image.png',
+      name: 'Liquids',
+      isSelected: false),
+  IngredientsCategory(
+      assetName: 'lib/images/opening-image.png',
+      name: 'Condiments',
+      isSelected: false),
+  IngredientsCategory(
+      assetName: 'lib/images/opening-image.png',
+      name: 'Baking Essentials',
+      isSelected: false),
+];
+
+class IngredientsCategory {
+  final String assetName;
+  final String name;
+  bool isSelected;
+
+  IngredientsCategory(
+      {required this.assetName,
+      required this.name,
       this.isSelected = false});
 }
 
@@ -87,12 +92,12 @@ class IngredientCategoryCards extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.builder(
       scrollDirection: Axis.horizontal,
-      itemCount: _categories.length,
+      itemCount: _ingredientCategories.length,
       padding: EdgeInsets.symmetric(horizontal: 8),
       itemBuilder: (context, index) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: IngredientCategoryCard(category: _categories[index]),
+          child: IngredientCategoryCard(category: _ingredientCategories[index]),
         );
       },
     );
@@ -100,7 +105,7 @@ class IngredientCategoryCards extends StatelessWidget {
 }
 
 class IngredientCategoryCard extends StatefulWidget {
-  final Category category;
+  final IngredientsCategory category;
 
   const IngredientCategoryCard({
     required this.category,
@@ -366,59 +371,39 @@ class AdminIngredientCard extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          // LEFT: Name and Unit
           Padding(
-            padding: EdgeInsets.fromLTRB(4, 2, 0, 2),
-            child: Row(
+            padding: EdgeInsets.fromLTRB(8, 8, 0, 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: SizedBox(
-                    height: imageHeight,
-                    width: imageWidth,
-                    child: Image.network(
-                      ingredient.imageUrl ?? '',
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey[300],
-                          child: Icon(Icons.image_not_supported),
-                        );
-                      },
-                    ),
+                Text(
+                  ingredient.name,
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: titleFontSize,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(4, 4, 0, 0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        ingredient.name,
-                        style: TextStyle(
-                            fontFamily: 'Inter', fontSize: titleFontSize),
-                      ),
-                      Text(
-                        ingredient.unit,
-                        style: TextStyle(
-                            fontFamily: 'Inter', fontSize: subtitleFontSize),
-                      ),
-                    ],
+                Text(
+                  ingredient.unit,
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: subtitleFontSize,
+                    color: Colors.black54,
                   ),
                 ),
               ],
             ),
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
-                child: AddRemoveButton(
+
+          // RIGHT: Quantity + Delete + Category (side by side)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                AddRemoveButton(
                   initialValue: ingredient.quantity,
                   onChanged: (quantity) async {
                     try {
@@ -436,35 +421,56 @@ class AdminIngredientCard extends StatelessWidget {
                     }
                   },
                 ),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
-                child: IconButton(
-                  icon: Icon(Icons.delete, size: iconButtonSize),
-                  padding: EdgeInsets.zero,
-                  visualDensity: VisualDensity.compact,
-                  color: c_pri_yellow,
-                  onPressed: () async {
-                    try {
-                      await Supabase.instance.client
-                          .from('ingredients')
-                          .delete()
-                          .eq('id', ingredient.id);
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content: Text(
-                                'Failed to delete ${ingredient.name}: ${e.toString()}')),
-                      );
-                    }
-                  },
+                SizedBox(height: 4),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        ingredient.category ?? 'Uncategorized',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    IconButton(
+                      icon: Icon(Icons.delete, size: iconButtonSize),
+                      padding: EdgeInsets.zero,
+                      visualDensity: VisualDensity.compact,
+                      color: c_pri_yellow,
+                      onPressed: () async {
+                        try {
+                          await Supabase.instance.client
+                              .from('ingredients')
+                              .delete()
+                              .eq('id', ingredient.id);
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text(
+                                    'Failed to delete ${ingredient.name}: ${e.toString()}')),
+                          );
+                        }
+                      },
+                    ),
+                  ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
     );
+
   }
 }
 
@@ -1440,12 +1446,7 @@ class _CheckoutCardState extends State<CheckoutCard> {
                         widget.category.name,
                         style: TextStyle(
                             fontFamily: 'Inter', fontSize: titleFontSize),
-                      ),
-                      Text(
-                        widget.category.detail,
-                        style: TextStyle(
-                            fontFamily: 'Inter', fontSize: subtitleFontSize),
-                      ),
+                      ),                     
                     ],
                   ),
                 ),
