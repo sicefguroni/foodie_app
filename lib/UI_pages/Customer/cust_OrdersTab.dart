@@ -41,10 +41,10 @@ class CustomerOrdersTab extends StatelessWidget {
               child: CustomTabBar(
                 tabLabels: ['Pending', 'Accepted', 'To Deliver', 'Completed'],
                 tabContents: [
-                  CheckoutCards(),
-                  CheckoutCards(),
-                  CheckoutCards(),
-                  CheckoutCards(),
+                  CustomerOrdersCards(statusFilter: 'Pending'),
+                  CustomerOrdersCards(statusFilter: 'Accepted'),
+                  CustomerOrdersCards(statusFilter: 'To Deliver'),
+                  CustomerOrdersCards(statusFilter: 'Completed'),
                 ],
               ),
             ),

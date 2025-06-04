@@ -10,6 +10,7 @@ import '../UI_pages/Schemas/Food.dart';
 import '../UI_pages/Templates/AddIngredient_Form.dart';
 import '../UI_pages/Templates/AddFood_Form.dart';
 import 'package:foodie_app/UI_pages/Templates/cust_food_Order.dart';
+import '../UI_pages/Schemas/Order.dart';
 
 // SAMPLE CARD INPUTS
 // SAMPLE CARD INPUTS
@@ -787,29 +788,103 @@ class _CustomerFoodCardState extends State<CustomerFoodCard> {
 
 // FOUND IN ad_OrdersTab
 // FOUND IN ad_OrdersTab
-class AdminOrdersCards extends StatelessWidget {
+class AdminOrdersCards extends StatefulWidget {
+  final String statusFilter;
+
+  const AdminOrdersCards({
+    required this.statusFilter,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<AdminOrdersCards> createState() => _AdminOrdersCardsState();
+}
+
+class _AdminOrdersCardsState extends State<AdminOrdersCards> {
+  List<OrderModel> orders = [];
+  bool isLoading = true;
+  RealtimeChannel? _channel;
+
+  @override 
+  void initState() {
+    super.initState();
+    fetchOrders();
+    setupRealtimeListener();
+  }
+
+  @override
+  void dispose() {
+    _channel?.unsubscribe();
+    super.dispose();
+  }
+  
+  Future<void> fetchOrders() async {
+    try {
+      final response = await Supabase.instance.client
+        .from('orders')
+        .select('''
+          id,
+          order_total,
+          order_status,
+          customers(first_name, last_name),
+          order_items(product_id, products(product_name))
+        ''')
+        .eq('order_status', widget.statusFilter)
+        .order('created_at', ascending: false);
+
+      setState(() {
+        orders = response.map<OrderModel>((json) => OrderModel.fromJson(json)).toList();
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error fetching orders: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void setupRealtimeListener() {
+    _channel = Supabase.instance.client
+      .channel('public:orders')
+      .onPostgresChanges(
+        event: PostgresChangeEvent.all, 
+        schema: 'public',
+        table: 'orders',
+        callback: (payload) {
+          fetchOrders();
+        })
+      .subscribe();
+  }
+
+
   @override
   Widget build(BuildContext context) {
+    if (isLoading) return Center(child: CircularProgressIndicator());
+
     return GridView.builder(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 1,
-        childAspectRatio: 2.8,
-        mainAxisSpacing: 2,
+        childAspectRatio: 2.3,
       ),
-      padding: EdgeInsets.all(8),
-      itemCount: _categories.length,
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4), 
+      itemCount: orders.length,
       itemBuilder: (context, index) {
-        return AdminOrdersCard(category: _categories[index]);
+        return AdminOrdersCard(order: orders[index], onStatusChanged: fetchOrders);
       },
     );
   }
 }
 
 class AdminOrdersCard extends StatefulWidget {
-  final Category category;
+  final OrderModel order;
+  final VoidCallback onStatusChanged;
 
   const AdminOrdersCard({
-    required this.category,
+
+    required this.order, 
+    required this.onStatusChanged,
+
     Key? key,
   }) : super(key: key);
 
@@ -818,6 +893,88 @@ class AdminOrdersCard extends StatefulWidget {
 }
 
 class _AdminOrdersCardState extends State<AdminOrdersCard> {
+
+  bool isLoading = false;
+
+  void updateOrderStatus(String newStatus) async {
+    setState(() {
+      isLoading = false;
+    });
+
+    try {
+      final response = await Supabase.instance.client
+        .from('orders')
+        .update({'order_status': newStatus})
+        .eq('id', widget.order.id);
+      
+      if (response.error == null) {
+        widget.onStatusChanged();
+      }
+    } catch (e) {
+      print('Error updating order status: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Widget buildActionButtons(String status) {
+    switch (status) {
+      case 'Pending':
+        return Row(
+          children: [
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () => updateOrderStatus('Accepted'),
+                child: Text('Accept'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: c_pri_yellow,
+                  foregroundColor: c_white,
+                ),
+              ),
+            ),
+            SizedBox(width: 6),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () => updateOrderStatus('Denied'),
+                child: Text('Deny'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: c_sec_yellow,
+                  foregroundColor: c_white,
+                ),
+              ),
+            ),
+          ],
+        );
+
+      case 'Accepted':
+        return ElevatedButton(
+          onPressed: () => updateOrderStatus('To Deliver'),
+          child: Text('Deliver'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: c_pri_yellow,
+            foregroundColor: c_white,
+          ),
+        );
+
+      case 'To Deliver':
+        return ElevatedButton(
+          onPressed: () => updateOrderStatus('Completed'),
+          child: Text('Complete'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: c_pri_yellow,
+            foregroundColor: c_white,
+          ),
+        );
+
+      case 'Completed':
+        return Container(); // No buttons needed
+
+      default:
+        return Container(); // fallback
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -830,10 +987,7 @@ class _AdminOrdersCardState extends State<AdminOrdersCard> {
     return Card(
       elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(8),
-        onTap: () {},
-        child: Container(
+      child: Container(
           width: double.infinity,
           padding: EdgeInsets.fromLTRB(2, 2, 8, 2),
           margin: EdgeInsets.zero,
@@ -841,85 +995,66 @@ class _AdminOrdersCardState extends State<AdminOrdersCard> {
             children: [
               Padding(
                 padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
-                child: CustomerAvatar(
-                  assetName: widget.category.assetName,
-                  radius: avatarRadius,
+                child: ClipOval(
+                  child:
+                  SizedBox(
+                    height: 40,
+                    width: 40,
+                    child: Image.network(
+                      widget.order.imageUrl ?? '',
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey[300],
+                          child: Icon(Icons.image_not_supported),
+                        );
+                      },
+                    ),
+                  ),
                 ),
               ),
               Expanded(
-                child: Column(
+                child: 
+                Column(
+
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Padding(
                       padding: EdgeInsets.fromLTRB(0, 4, 0, 0),
-                      child: Text(widget.category.name,
-                          style: TextStyle(fontSize: titleFontSize)),
+                      child: Text(widget.order.customerName, style: TextStyle(fontSize: titleFontSize)),
                     ),
-                    Padding(
+                    Padding(    
                       padding: EdgeInsets.fromLTRB(0, 0, 0, 7),
-                      child: Text(widget.category.status,
-                          style: TextStyle(fontSize: descriptionFontSize)),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: SizedBox(
-                            height: sizedboxHeight,
-                            child: ElevatedButton(
-                                onPressed: () {},
-                                child: Text('Accept',
-                                    style: TextStyle(fontSize: buttonFontSize)),
-                                style: ButtonStyle(
-                                  padding: MaterialStateProperty.all(
-                                      EdgeInsets.all(0)),
-                                  shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                  ),
-                                  backgroundColor:
-                                      MaterialStateProperty.all(c_pri_yellow),
-                                  foregroundColor:
-                                      MaterialStateProperty.all(c_white),
-                                )),
-                          ),
-                        ),
-                        SizedBox(width: 6),
-                        Expanded(
-                          child: SizedBox(
-                            height: sizedboxHeight,
-                            child: ElevatedButton(
-                                onPressed: () {},
-                                child: Text(
-                                  'Deny',
-                                  style: TextStyle(fontSize: buttonFontSize),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Wrap(
+                            spacing: 4,
+                            runSpacing: -6,
+                            children: widget.order.orderedItems.map((item) {
+                              return Chip(
+                                label: Text(
+                                  '${item.productName} x${item.quantity}',
+                                  style: TextStyle(fontSize: 10), // smaller font
                                 ),
-                                style: ButtonStyle(
-                                  padding: MaterialStateProperty.all(
-                                      EdgeInsets.all(0)),
-                                  shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                  ),
-                                  backgroundColor:
-                                      MaterialStateProperty.all(c_sec_yellow),
-                                  foregroundColor:
-                                      MaterialStateProperty.all(c_white),
-                                )),
+                                padding: EdgeInsets.symmetric(horizontal: 4, vertical: -2),
+                                visualDensity: VisualDensity.compact,
+                                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              );
+                            }).toList(),
                           ),
-                        ),
-                      ],
+                          Text('₱${widget.order.totalAmount.toStringAsFixed(2)}', style: TextStyle(fontSize: descriptionFontSize)),
+                        ],
+                      ),
                     ),
+                    buildActionButtons(widget.order.status),
                   ],
                 ),
               ),
             ],
           ),
         ),
-      ),
     );
   }
 }
@@ -986,6 +1121,14 @@ class _OrderStatusCardState extends State<OrderStatusCard> {
 // NAMED cust_Cart && FOUND IN cust_HomeTab & cust_OrdersTab
 // NAMED cust_Cart && FOUND IN cust_HomeTab & cust_OrdersTab
 class CartCards extends StatefulWidget {
+  final Function(Set<int>) onSelectionChanged;
+  final Function(List<Map<String, dynamic>>) onCartItemsChanged;
+
+  const CartCards({
+    required this.onSelectionChanged,
+    required this.onCartItemsChanged,
+  });
+
   @override
   State<CartCards> createState() => _CartCardsState();
 }
@@ -1017,6 +1160,7 @@ class _CartCardsState extends State<CartCards> {
           cartItems = [];
           isLoading = false;
         });
+        widget.onCartItemsChanged(cartItems);
         return;
       }
 
@@ -1029,11 +1173,13 @@ class _CartCardsState extends State<CartCards> {
         cartItems = List<Map<String, dynamic>>.from(response);
         isLoading = false;
       });
+      widget.onCartItemsChanged(cartItems);
     } catch (e) {
       print('Error fetching cart items: $e');
       setState(() {
         isLoading = false;
       });
+      widget.onCartItemsChanged(cartItems);
     }
   }
 
@@ -1069,6 +1215,8 @@ class _CartCardsState extends State<CartCards> {
       } else {
         selectedCartItemIds.add(cartItemId);
       }
+      print('Toggled selection. New selected IDs: $selectedCartItemIds');
+      widget.onSelectionChanged(selectedCartItemIds);
     });
   }
 
@@ -1078,26 +1226,28 @@ class _CartCardsState extends State<CartCards> {
       return Center(child: CircularProgressIndicator());
     }
     return GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 1,
-          childAspectRatio: 3,
-        ),
-        padding: EdgeInsets.symmetric(horizontal: 8),
-        itemCount: cartItems.length,
-        itemBuilder: (context, index) {
-          final cartItem = cartItems[index];
-          final food = Food.fromJson(cartItem['products']);
-          final cartItemId = cartItem['id'] as int;
-          return CartCard(
-            key: ValueKey(cartItemId),
-            food: food,
-            cartItemId: cartItemId,
-            quantity: cartItem['quantity'],
-            onQuantityChanged: updateCartItemQuantity,
-            isSelected: selectedCartItemIds.contains(cartItemId),
-            onSelected: () => toggleSelection(cartItemId),
-          );
-        });
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 1,
+        childAspectRatio: 3,
+      ), 
+      padding: EdgeInsets.symmetric(horizontal: 8),
+      itemCount: cartItems.length,
+      itemBuilder: (context, index) {
+        final cartItem = cartItems[index];
+        final food = Food.fromJson(cartItem['products']);
+        final cartItemId = cartItem['id'] as int;
+        return CartCard(
+          key: ValueKey(cartItemId),
+          food: food,
+          cartItemId: cartItemId,
+          quantity: cartItem['quantity'],
+          onQuantityChanged: updateCartItemQuantity,
+          isSelected: selectedCartItemIds.contains(cartItemId),
+          onSelected: () => toggleSelection(cartItemId),
+        );
+      }
+    );
+
   }
 }
 
@@ -1322,4 +1472,173 @@ class _CheckoutCardState extends State<CheckoutCard> {
       ),
     );
   }
+} 
+
+// FOUND IN cust_OrdersTab
+// FOUND IN cust_OrdersTab
+class CustomerOrdersCards extends StatefulWidget {
+  final String statusFilter;
+
+  const CustomerOrdersCards({
+    required this.statusFilter,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<CustomerOrdersCards> createState() => _CustomerOrdersCardsState();
 }
+
+class _CustomerOrdersCardsState extends State<CustomerOrdersCards> {
+  List<OrderModel> orders = [];
+  bool isLoading = true;
+  RealtimeChannel? _channel;
+
+  @override 
+  void initState() {
+    super.initState();
+    fetchOrders();
+    setupRealtimeListener();
+  }
+
+  @override
+  void dispose() {
+    _channel?.unsubscribe();
+    super.dispose();
+  }
+  
+  Future<void> fetchOrders() async {
+    try {
+      final response = await Supabase.instance.client
+        .from('orders')
+        .select('''
+          id,
+          order_total,
+          order_status,
+          customers(first_name, last_name),
+          order_items(quantity, products(product_name, image_url))
+        ''')
+        .eq('order_status', widget.statusFilter)
+        .order('created_at', ascending: false);
+
+      setState(() {
+        orders = response.map<OrderModel>((json) => OrderModel.fromJson(json)).toList();
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error fetching orders: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void setupRealtimeListener() {
+    _channel = Supabase.instance.client
+      .channel('public:orders')
+      .onPostgresChanges(
+        event: PostgresChangeEvent.all, 
+        schema: 'public',
+        table: 'orders',
+        callback: (payload) {
+          fetchOrders();
+        })
+      .subscribe();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading) return Center(child: CircularProgressIndicator());
+
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 1,
+        childAspectRatio: 3,
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4), 
+      itemCount: orders.length,
+      itemBuilder: (context, index) {
+        return CustomerOrdersCard(order: orders[index], onStatusChanged: fetchOrders);
+      },
+    );
+  }
+}
+
+class CustomerOrdersCard extends StatefulWidget {
+  final OrderModel order;
+  final VoidCallback onStatusChanged;
+
+  const CustomerOrdersCard({
+    required this.order, 
+    required this.onStatusChanged,
+    Key? key,
+  }) : super(key: key);
+  
+  @override
+  State<CustomerOrdersCard> createState() => _CustomerOrdersCardState();
+}
+
+class _CustomerOrdersCardState extends State<CustomerOrdersCard> {
+  bool isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double avatarRadius = screenWidth * .12;
+    double titleFontSize = screenWidth * 0.045;
+    double descriptionFontSize = screenWidth * 0.04;
+    double buttonFontSize = screenWidth * 0.04;
+    double sizedboxHeight = screenWidth * 0.09;
+
+    return Card(
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.fromLTRB(2,2,8,2),
+          margin: EdgeInsets.zero,
+          child: Row(
+            children: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
+                child: ClipOval(
+                  child:
+                  SizedBox(
+                    height: 40,
+                    width: 40,
+                    child: Image.network(
+                      widget.order.imageUrl ?? '',
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey[300],
+                          child: Icon(Icons.image_not_supported),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: 
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ...widget.order.orderedItems.map((item) => Text(
+                      '${item.productName} x${item.quantity}',
+                      style: TextStyle(fontSize: 14),
+                    )),
+                    SizedBox(height: 6),
+                    Text(
+                      '₱${widget.order.totalAmount.toStringAsFixed(2)}',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+    );
+  }
+} 
+
