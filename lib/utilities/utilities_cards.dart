@@ -643,65 +643,66 @@ class AdminFoodCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  food.product_name,
-                  style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w700,
-                      fontSize: titleFontSize),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        food.product_name,
+                        style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w700,
+                            fontSize: titleFontSize),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(right: 8),
+                      child: IconButton(
+                        icon: Icon(Icons.delete, size: iconButtonSize),
+                        padding: EdgeInsets.zero,
+                        visualDensity: VisualDensity.compact,
+                        color: c_pri_yellow,
+                        constraints: BoxConstraints(maxWidth: 32, maxHeight: 32),
+                        onPressed: () async {
+                          final client = Supabase.instance.client;
+
+                          try {
+                            // Delete from recipes first
+                            await client
+                                .from('recipes')
+                                .delete()
+                                .eq('product_ID', food.id);
+
+                            // Delete from products
+                            await client
+                                .from('products')
+                                .delete()
+                                .eq('id', food.id);
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('${food.product_name} deleted successfully.'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                          } catch (e) {
+                            print('Error deleting food: $e');
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Failed to delete food. Please try again.'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ],
                 ),
                 Text(
                   food.availability ? 'Available' : 'Unavailable',
                   style: TextStyle(
                       fontFamily: 'Inter', fontSize: subtitleFontSize),
-                ),
-                IconButton(
-                  icon: Icon(Icons.delete, size: iconButtonSize),
-                  padding: EdgeInsets.zero,
-                  visualDensity: VisualDensity.compact,
-                  color: c_pri_yellow,
-                onPressed: () async {
-                    final client = Supabase.instance.client;
-
-                    try {
-                      // Delete all recipes using this product (assuming FK: recipe.product_id → products.id)
-                      final recipeResponse = await client
-                          .from('recipes')
-                          .delete()
-                          .eq('recipes.product_id', food.id);
-
-                      if (recipeResponse.error != null) {
-                        throw Exception(
-                            'Failed to delete related recipes: ${recipeResponse.error!.message}');
-                      }
-
-                      // Delete the product itself
-                      final productResponse = await client
-                          .from('products')
-                          .delete()
-                          .eq('id', food.id);
-
-                      if (productResponse.error != null) {
-                        throw Exception(
-                            'Failed to delete product: ${productResponse.error!.message}');
-                      }
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                              '${food.product_name} deleted successfully.'),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Deletion error: ${e.toString()}'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                    }
-                  },
                 ),
               ],
             ),
