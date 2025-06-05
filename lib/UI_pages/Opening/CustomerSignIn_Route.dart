@@ -87,69 +87,110 @@ class _CustomerSignInRouteState extends State<CustomerSignInRoute> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: Stack(
         children: [
+          Positioned.fill(
+            child: Image.asset(
+              'lib/images/foodie_bg.png',
+              fit: BoxFit.cover,
+            ),
+          ),
           Padding(
-            padding: const EdgeInsets.only(
-                top: 16.0, left: 0), // already padded horizontally
+            padding: const EdgeInsets.all(4.0),
             child: YellowBackButton(),
           ),
-          TitleText(title: 'Foodie', color: c_pri_yellow),
-          Heading3_Text(text: 'Welcome to Foodie!', color: c_pri_yellow),
-          bodyText(text: 'Sign in your account', color: c_pri_yellow),
-          const SizedBox(height: 75),
           Container(
             width: double.infinity,
-            margin: EdgeInsets.zero,
-            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 0),
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+            margin: EdgeInsets.symmetric(horizontal: 0, vertical: 64),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                InputTextField(
-                    hintText: 'Email',
-                    controller: _emailController,
-                    obscureText: false),
-                const SizedBox(height: 25),
-                InputTextField(
-                    hintText: 'Password',
-                    controller: _passwordController,
-                    obscureText: true),
-                const SizedBox(height: 25),
-                ActionButton(
-                  buttonName: 'Sign In',
-                  backgroundColor: c_pri_yellow,
-                  onPressed: login,
-                ),
-                Center(
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SignUpRoute_1st()),
-                      );
-                    },
-                    child: MouseRegion(
-                      cursor: SystemMouseCursors.click,
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: DefaultTextStyle.merge(
-                          style: TextStyle(
-                            decoration: TextDecoration.underline,
-                            decorationColor: c_pri_yellow,
-                            color: c_pri_yellow,
-                          ),
-                          child: bodyText(
-                            text: "Don't have an account? Sign Up",
-                            color: c_pri_yellow,
+                TitleText(title: 'Foodie', color: c_pri_yellow),
+                Heading3_Text(text: 'Welcome to Foodie!', color: c_pri_yellow),
+                bodyText(text: 'Sign in your account', color: c_pri_yellow),
+              ],
+            ),
+          ),
+          SafeArea(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  
+                  const SizedBox(height: 50),
+                  Container(
+                    width: double.infinity,
+                    margin: EdgeInsets.zero,
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        InputTextField(
+                            hintText: 'Email',
+                            labelText: 'Email',
+                            controller: _emailController,
+                            obscureText: false),
+                        const SizedBox(height: 15),
+                        InputTextField(
+                            hintText: 'Password',
+                            labelText: 'Password',
+                            controller: _passwordController,
+                            isPassword: true),
+                        const SizedBox(height: 25),
+                        NormalButton(
+                          buttonName: 'Sign In',
+                          backgroundColor: c_pri_yellow,
+                          fontColor: c_white,
+                          onPressed: login,
+                        ),
+                        Center(
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => SignUpRoute_1st()),
+                              );
+                            },
+                            child: MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: RichText(
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: "Don't have an account? ",
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontFamily: 'Poppins',
+                                          fontSize: 12
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: "Sign Up",
+                                        style: TextStyle(
+                                          color: c_pri_yellow,
+                                          fontFamily: 'Poppins',
+                                          decoration: TextDecoration.underline,
+                                          decorationColor: c_pri_yellow,
+                                          fontSize: 12
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),        
             ),
           ),
         ],

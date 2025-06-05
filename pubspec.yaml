@@ -115,7 +115,8 @@ flutter:
     - lib/images/opening-image.png
     - lib/images/white-back-button.png
     - lib/images/yellow-back-button.png
-    - lib/images/
+    - lib/images/foodie_bg.png
+    - lib/images/foodie_1st_bg.png
     - .env
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package

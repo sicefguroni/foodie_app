@@ -773,7 +773,7 @@ class _CustomerFoodCardState extends State<CustomerFoodCard> {
                       fontSize: titleFontSize),
                 ),
                 Text(
-                  widget.food.price.toString(),
+                  '₱${widget.food.price.toStringAsFixed(2)}',
                   style: TextStyle(
                       fontFamily: 'Inter', fontSize: subtitleFontSize),
                 ),
@@ -826,8 +826,8 @@ class _AdminOrdersCardsState extends State<AdminOrdersCards> {
           id,
           order_total,
           order_status,
-          customers(first_name, last_name),
-          order_items(product_id, products(product_name))
+          customers(first_name, last_name, image_url),
+          order_items(quantity, product_id, products(product_name))
         ''')
         .eq('order_status', widget.statusFilter)
         .order('created_at', ascending: false);
@@ -843,6 +843,7 @@ class _AdminOrdersCardsState extends State<AdminOrdersCards> {
       });
     }
   }
+
 
   void setupRealtimeListener() {
     _channel = Supabase.instance.client
@@ -926,10 +927,14 @@ class _AdminOrdersCardState extends State<AdminOrdersCard> {
             Expanded(
               child: ElevatedButton(
                 onPressed: () => updateOrderStatus('Accepted'),
-                child: Text('Accept'),
+                child: Text('Accept', style: TextStyle(fontSize: 12)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: c_pri_yellow,
                   foregroundColor: c_white,
+                  padding: EdgeInsets.symmetric(vertical: 4),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                 ),
               ),
             ),
@@ -937,10 +942,13 @@ class _AdminOrdersCardState extends State<AdminOrdersCard> {
             Expanded(
               child: ElevatedButton(
                 onPressed: () => updateOrderStatus('Denied'),
-                child: Text('Deny'),
+                child: Text('Deny', style: TextStyle(fontSize: 12)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: c_sec_yellow,
                   foregroundColor: c_white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                 ),
               ),
             ),
@@ -948,22 +956,36 @@ class _AdminOrdersCardState extends State<AdminOrdersCard> {
         );
 
       case 'Accepted':
-        return ElevatedButton(
-          onPressed: () => updateOrderStatus('To Deliver'),
-          child: Text('Deliver'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: c_pri_yellow,
-            foregroundColor: c_white,
+        return SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () => updateOrderStatus('To Deliver'),
+            child: Text('Deliver', style: TextStyle(fontSize: 12)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: c_pri_yellow,
+              foregroundColor: c_white,
+              padding: EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
           ),
         );
 
       case 'To Deliver':
-        return ElevatedButton(
-          onPressed: () => updateOrderStatus('Completed'),
-          child: Text('Complete'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: c_pri_yellow,
-            foregroundColor: c_white,
+        return SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () => updateOrderStatus('Completed'),
+            child: Text('Complete', style: TextStyle(fontSize: 12)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: c_pri_yellow,
+              foregroundColor: c_white,
+              padding: EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
           ),
         );
 
@@ -998,10 +1020,10 @@ class _AdminOrdersCardState extends State<AdminOrdersCard> {
                 child: ClipOval(
                   child:
                   SizedBox(
-                    height: 40,
-                    width: 40,
+                    height: 60,
+                    width: 60,
                     child: Image.network(
-                      widget.order.imageUrl ?? '',
+                      widget.order.customerImageUrl ?? '',
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
@@ -1016,37 +1038,39 @@ class _AdminOrdersCardState extends State<AdminOrdersCard> {
               Expanded(
                 child: 
                 Column(
-
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Padding(
-                      padding: EdgeInsets.fromLTRB(0, 4, 0, 0),
+                      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                       child: Text(widget.order.customerName, style: TextStyle(fontSize: titleFontSize)),
                     ),
+                    
                     Padding(    
-                      padding: EdgeInsets.fromLTRB(0, 0, 0, 7),
+                      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Wrap(
-                            spacing: 4,
-                            runSpacing: -6,
-                            children: widget.order.orderedItems.map((item) {
-                              return Chip(
-                                label: Text(
-                                  '${item.productName} x${item.quantity}',
-                                  style: TextStyle(fontSize: 10), // smaller font
-                                ),
-                                padding: EdgeInsets.symmetric(horizontal: 4, vertical: -2),
-                                visualDensity: VisualDensity.compact,
-                                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              );
-                            }).toList(),
-                          ),
-                          Text('₱${widget.order.totalAmount.toStringAsFixed(2)}', style: TextStyle(fontSize: descriptionFontSize)),
+                          ...widget.order.orderedItems.map((item) => Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                item.productName,
+                                style: TextStyle(fontSize: titleFontSize),
+                              ),
+                              Text(
+                                ' x${item.quantity}',
+                                style: TextStyle(fontSize: titleFontSize),
+                              ),
+                            ],
+                          )),
+                          Text('₱${widget.order.totalAmount.toStringAsFixed(2)}', style: TextStyle(fontSize: titleFontSize)),
                         ],
                       ),
+                    ),
+                     Divider(
+                      color: Colors.grey,
+                      thickness: .2,
                     ),
                     buildActionButtons(widget.order.status),
                   ],
@@ -1271,7 +1295,9 @@ class CartCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
+    double imageHeight = screenHeight * 0.13;
     double imageWidth = screenWidth * 0.25;
     double titleFontSize = screenWidth * 0.045;
     double subtitleFontSize = screenWidth * 0.04;
@@ -1293,6 +1319,7 @@ class CartCard extends StatelessWidget {
                   clipBehavior: Clip.antiAlias,
                   child: SizedBox(
                     width: imageWidth,
+                    height: imageHeight,
                     child: Image.network(
                       food.imageUrl ?? '',
                       fit: BoxFit.cover,
@@ -1317,7 +1344,7 @@ class CartCard extends StatelessWidget {
                             fontFamily: 'Inter', fontSize: titleFontSize),
                       ),
                       Text(
-                        'P${food.price.toString()}',
+                        '₱${food.price.toStringAsFixed(2)}',
                         style: TextStyle(
                             fontFamily: 'Inter', fontSize: subtitleFontSize),
                       ),
@@ -1552,7 +1579,7 @@ class _CustomerOrdersCardsState extends State<CustomerOrdersCards> {
     return GridView.builder(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 1,
-        childAspectRatio: 3,
+        childAspectRatio: 3.2,
       ),
       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4), 
       itemCount: orders.length,
@@ -1583,6 +1610,9 @@ class _CustomerOrdersCardState extends State<CustomerOrdersCard> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    double imageHeight = screenHeight * 0.12;
+    double imageWidth = screenWidth * 0.25;
     double avatarRadius = screenWidth * .12;
     double titleFontSize = screenWidth * 0.045;
     double descriptionFontSize = screenWidth * 0.04;
@@ -1598,15 +1628,14 @@ class _CustomerOrdersCardState extends State<CustomerOrdersCard> {
           margin: EdgeInsets.zero,
           child: Row(
             children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
-                child: ClipOval(
-                  child:
+              Card(
+                clipBehavior: Clip.antiAlias,
+                child:
                   SizedBox(
-                    height: 40,
-                    width: 40,
+                    height: imageHeight,
+                    width: imageWidth,
                     child: Image.network(
-                      widget.order.imageUrl ?? '',
+                      widget.order.productImageUrl ?? '',
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
@@ -1617,20 +1646,43 @@ class _CustomerOrdersCardState extends State<CustomerOrdersCard> {
                     ),
                   ),
                 ),
-              ),
+             
               Expanded(
                 child: 
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    ...widget.order.orderedItems.map((item) => Text(
-                      '${item.productName} x${item.quantity}',
-                      style: TextStyle(fontSize: 14),
-                    )),
-                    SizedBox(height: 6),
-                    Text(
-                      '₱${widget.order.totalAmount.toStringAsFixed(2)}',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    Padding(
+                      padding: EdgeInsets.only(left: 4,top: 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ...widget.order.orderedItems.map((item) => Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                item.productName,
+                                style: TextStyle(fontSize: 14),
+                              ),
+                              Text(
+                                'x${item.quantity}',
+                                style: TextStyle(fontSize: 14),
+                              ),
+                            ],
+                          )),
+                        ],
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: 8),
+                        child: Text(
+                          '₱${widget.order.totalAmount.toStringAsFixed(2)}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
                     ),
                   ],
                 ),

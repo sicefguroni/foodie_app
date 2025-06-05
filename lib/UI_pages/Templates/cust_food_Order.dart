@@ -19,12 +19,20 @@ class CustomerFoodTemplate extends StatefulWidget {
 }
 
 class _CustomerFoodTemplateState extends State<CustomerFoodTemplate> {
-  late int quantity;
+  int quantity = 1;
+  double total = 0;
 
   @override
   void initState() {
     super.initState();
-    quantity = 1;
+    total = widget.food.price;
+  }
+
+  void updateTotal(int newQuantity) {
+    setState(() {
+      quantity = newQuantity;
+      total = widget.food.price * newQuantity;
+    });
   }
 
   Future<void> addToCart() async {
@@ -60,12 +68,13 @@ class _CustomerFoodTemplateState extends State<CustomerFoodTemplate> {
       body: SafeArea(
         child: Stack(
           children: [
+            // Background Image
             Positioned(
               top: 0,
               left: 0,
               right: 0,
               child: Container(
-                height: MediaQuery.of(context).size.height * 0.45,
+                height: MediaQuery.of(context).size.height * 0.65,
                 child: Image.network(
                   widget.food.imageUrl ?? 'lib/images/opening-image.png',
                   fit: BoxFit.cover,
@@ -78,67 +87,97 @@ class _CustomerFoodTemplateState extends State<CustomerFoodTemplate> {
                 ),
               ),
             ),
+
+            // Back Button
             Positioned(
               top: 8,
               left: 4,
-              child: YellowBackButton()
+              child: YellowBackButton(),
             ),
-            Positioned(
-              top: MediaQuery.of(context).size.height * 0.4,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: c_pri_yellow,
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
-                ),
-                margin: EdgeInsets.zero,
-                child: Container(
+            // Bottom Sheet
+            DraggableScrollableSheet(
+              initialChildSize: 0.42,
+              minChildSize: 0.42,
+              maxChildSize: 0.45,
+              builder: (context, scrollController) {
+                return Container(
                   decoration: BoxDecoration(
                     color: c_white,
-                    borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
-                  ),
-                  margin: EdgeInsets.only(top: 16),
-                  padding: EdgeInsets.all(12),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Heading2_Text(text: widget.food.product_name, color: c_pri_yellow),
-                      Padding(
-                        padding: EdgeInsets.zero,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Heading4_Text(text: 'Description', color: c_pri_yellow),
-                            bodyText(text: widget.food.description, color: Colors.black),
-                          ],
-                        ),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        spreadRadius: 5,
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    ],
+                  ),
+                  child: SingleChildScrollView(
+                    controller: scrollController,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Heading4_Text(text: 'Total: P${widget.food.price}', color: Colors.black),
-                          AddRemoveButton(
-                            initialValue: 1,
-                            onChanged: (_quantity) {
-                              setState(() {
-                                quantity = _quantity;
-                              });
-                            },
+                          // Drag Handle
+                          Center(
+                            child: Container(
+                              width: 40,
+                              height: 4,
+                              margin: EdgeInsets.only(bottom: 20),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                          ),
+                          // Food Name
+                          Heading2_Text(
+                            text: widget.food.product_name,
+                            color: c_pri_yellow,
+                          ),
+                          SizedBox(height: 8),
+                          // Description Section
+                          bodyText(
+                            text: widget.food.description,
+                            color: Colors.black,
+                          ),
+                          SizedBox(height: 8),
+                          Divider(
+                            color: Colors.grey,
+                            thickness: .2,
+                          ),
+                          SizedBox(height: 8),
+                          // Price and Quantity Section
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Heading4_Text(
+                                text: 'Total: P${total}',
+                                color: Colors.black,
+                              ),
+                              AddRemoveButton(
+                                initialValue: 1,
+                                onChanged: updateTotal,
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 20),
+                          // Add to Cart Button
+                          ActionButton(
+                            buttonName: 'Add to Cart',
+                            onPressed: addToCart,
+                            backgroundColor: c_pri_yellow,
                           ),
                         ],
                       ),
-                      ActionButton(
-                        buttonName: 'Add to Cart', 
-                        onPressed: addToCart, 
-                        backgroundColor: c_pri_yellow
-                      )
-                    ],
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           ],
         ),

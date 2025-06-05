@@ -3,7 +3,8 @@ class OrderModel {
   final String customerName;
   String status;
   final double totalAmount;
-  final String? imageUrl;
+  final String? customerImageUrl;
+  final String? productImageUrl;
   final List<OrderItem> orderedItems;
 
   OrderModel({
@@ -12,7 +13,8 @@ class OrderModel {
     required this.status,
     required this.totalAmount,
     required this.orderedItems,
-    this.imageUrl,
+    this.customerImageUrl,
+    this.productImageUrl,
   });
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
@@ -33,7 +35,8 @@ class OrderModel {
       customerName: "${customer['first_name']} ${customer['last_name']}",
       status: json['order_status'],
       totalAmount: (json['order_total'] as num).toDouble(),
-      imageUrl: "${customer['image_url']}",
+      customerImageUrl: customer['image_url'],
+      productImageUrl: orderedItemsRaw.isNotEmpty ? orderedItemsRaw[0]['products']['image_url'] : null,
       orderedItems: items,
     );
   }

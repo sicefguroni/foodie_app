@@ -113,15 +113,15 @@ class SignUpRoute_2nd extends StatelessWidget {
                         InputTextField(
                           hintText: 'Username'
                         ),
-                        const SizedBox(height: 25),
+                        const SizedBox(height: 15),
                         InputTextField(
                           hintText: 'Password'
                         ),
-                        const SizedBox(height: 25),
+                        const SizedBox(height: 15),
                         InputTextField(
                           hintText: 'Confirm Password'
                         ),
-                        const SizedBox(height: 25),
+                        const SizedBox(height: 15),
                         ActionButton(
                           buttonName: 'Sign Up',
                           backgroundColor: c_pri_yellow,
