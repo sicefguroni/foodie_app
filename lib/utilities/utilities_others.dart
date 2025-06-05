@@ -256,7 +256,6 @@ class _DropdownMenuCategoriesState<T> extends State<DropdownMenuCategories<T>> {
   @override
   void initState() {
     super.initState();
-    // If editing, set the initial selection from the passed initialValue
     selectedCategory = widget.initialValue;
   }
 
@@ -270,6 +269,21 @@ class _DropdownMenuCategoriesState<T> extends State<DropdownMenuCategories<T>> {
         });
         widget.onChanged(value);
       },
+      inputDecorationTheme: InputDecorationTheme(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(4),
+          borderSide: BorderSide(color: c_sec_yellow, width: 2),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(4),
+          borderSide: BorderSide(color: c_sec_yellow, width: 1),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(4),
+          borderSide: BorderSide(color: c_sec_yellow, width: 1),
+        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      ),
       dropdownMenuEntries: widget.items.map((item) {
         return DropdownMenuEntry<T>(
           value: item,

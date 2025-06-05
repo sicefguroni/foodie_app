@@ -156,7 +156,7 @@ class _CustomerFoodTemplateState extends State<CustomerFoodTemplate> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Heading4_Text(
-                                text: 'Total: P${total}',
+                                text: 'Total: P${total.toStringAsFixed(2)}',
                                 color: Colors.black,
                               ),
                               AddRemoveButton(
