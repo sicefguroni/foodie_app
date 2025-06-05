@@ -249,7 +249,7 @@ class _AddFoodTemplateState extends State<AddFoodTemplate> {
                           selectedIngredients: _selectedIngredients,
                           onChanged: (List<IngredientWithQuantity> selected) {
                             _selectedIngredients = selected;
-                            _ingredientError = true;
+                            _ingredientError = false;
                           },
                         ),
                         if (_ingredientError)
