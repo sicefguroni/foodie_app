@@ -5,6 +5,7 @@ import '../../Utilities/utilities_buttons.dart';
 import '../../Utilities/utilities_texts.dart';
 import '../../auth/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'CustomerSignUp_Route.dart';
 
 class CustomerSignInRoute extends StatefulWidget {
   const CustomerSignInRoute({super.key});
@@ -125,46 +126,90 @@ class _CustomerSignInRouteState extends State<CustomerSignInRoute> {
             padding: const EdgeInsets.all(4.0),
             child: YellowBackButton(),
           ),
-          TitleText(title: 'Foodie', color: c_pri_yellow),
-          Heading3_Text(text: 'Welcome Back!', color: c_pri_yellow),
-          bodyText(text: 'Sign in to your Account', color: c_pri_yellow),
-          const SizedBox(height: 75),
           Container(
             width: double.infinity,
-            margin: EdgeInsets.zero,
-            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 0),
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+            margin: EdgeInsets.symmetric(horizontal: 0, vertical: 64),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                InputTextField(
-                    hintText: 'Email',
-                    controller: _emailController,
-                    obscureText: false),
-                const SizedBox(height: 25),
-                InputTextField(
-                    hintText: 'Password',
-                    controller: _passwordController,
-                    obscureText: true),
-                
-                // Error message display
-                if (_errorMessage != null) ...[
-                  const SizedBox(height: 10),
-                  Text(
-                    _errorMessage!,
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
+                TitleText(title: 'Foodie', color: c_pri_yellow),
+                Heading3_Text(text: 'Welcome Back!', color: c_pri_yellow),
+                bodyText(text: 'Sign in to your Account', color: c_pri_yellow),
+              ],
+            ),
+          ),
+          SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 50), 
+                Container(
+                  width: double.infinity,
+                  margin: EdgeInsets.zero,
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      InputTextField(
+                          hintText: 'Email',
+                          controller: _emailController,
+                          obscureText: false),
+                      const SizedBox(height: 15),
+                      InputTextField(
+                          hintText: 'Password',
+                          controller: _passwordController,
+                          obscureText: true),
+                      
+                      // Error message display
+                      if (_errorMessage != null) ...[
+                        const SizedBox(height: 10),
+                        Text(
+                          _errorMessage!,
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                      
+                      const SizedBox(height: 25),
+                      ActionButton(
+                        buttonName: 'Sign In',
+                        backgroundColor: c_pri_yellow,
+                        onPressed: login,
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Don't have an account? ",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontFamily: 'Poppins',
+                              fontSize: 12,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => SignUpRoute_1st()));
+                            },
+                            child: Text(
+                              'Sign up',
+                              style: TextStyle(
+                                color: c_pri_yellow,
+                                fontFamily: 'Poppins',
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                ],
-                
-                const SizedBox(height: 25),
-                ActionButton(
-                  buttonName: 'Sign In',
-                  backgroundColor: c_pri_yellow,
-                  onPressed: login,
                 ),
               ],
             ),
