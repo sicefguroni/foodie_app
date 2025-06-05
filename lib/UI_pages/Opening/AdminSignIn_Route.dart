@@ -134,7 +134,7 @@ class _AdminSignInRouteState extends State<AdminSignInRoute> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 TitleText(title: 'Foodie', color: c_pri_yellow),
-                Heading3_Text(text: 'Welcome to Foodie!', color: c_pri_yellow),
+                Heading3_Text(text: 'Welcome!', color: c_pri_yellow),
                 bodyText(text: 'Sign in your account', color: c_pri_yellow),
               ],
             ),

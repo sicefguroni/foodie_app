@@ -160,7 +160,7 @@ class _CustomerSignInRouteState extends State<CustomerSignInRoute> {
                       InputTextField(
                           hintText: 'Password',
                           controller: _passwordController,
-                          obscureText: true),
+                          isPassword: true),
                       
                       // Error message display
                       if (_errorMessage != null) ...[

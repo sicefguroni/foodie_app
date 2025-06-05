@@ -56,7 +56,7 @@ class _SignUpRoute_1stState extends State<SignUpRoute_1st> {
                   ),
                 ),
                 TitleText(title: 'Foodie', color: c_pri_yellow),
-                Heading3_Text(text: 'Welcome!', color: c_pri_yellow),
+                Heading3_Text(text: 'Welcome to Foodie!', color: c_pri_yellow),
                 bodyText(text: 'Create your account', color: c_pri_yellow),
                 const SizedBox(height: 20),
                 Expanded(
