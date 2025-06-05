@@ -947,7 +947,6 @@ class _AdminOrdersCardsState extends State<AdminOrdersCards> {
     }
   }
 
-
   void setupRealtimeListener() {
     _channel = Supabase.instance.client
       .channel('public:orders')
@@ -960,7 +959,6 @@ class _AdminOrdersCardsState extends State<AdminOrdersCards> {
         })
       .subscribe();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -1056,6 +1054,23 @@ class _AdminOrdersCardState extends State<AdminOrdersCard> {
               ),
             ),
           ],
+        );
+
+      case 'Denied':
+        return SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () => updateOrderStatus('Pending'),
+            child: Text('Restore', style: TextStyle(fontSize: 12)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: c_pri_yellow,
+              foregroundColor: c_white,
+              padding: EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ),
         );
 
       case 'Accepted':
@@ -1265,6 +1280,7 @@ class _CartCardsState extends State<CartCards> {
   Set<int> selectedCartItemIds = {}; // Track selected cart item IDs
   bool isLoading = true;
   RealtimeChannel? _channel;
+  double totalPrice = 0;
 
   @override
   void initState() {
@@ -1294,7 +1310,8 @@ class _CartCardsState extends State<CartCards> {
       final response = await Supabase.instance.client
           .from('cart_items')
           .select('*, products(*)')
-          .eq('cust_id', userId);
+          .eq('cust_id', userId)
+          .order('created_at', ascending: false); // Add consistent ordering
 
       setState(() {
         cartItems = List<Map<String, dynamic>>.from(response);
@@ -1310,6 +1327,24 @@ class _CartCardsState extends State<CartCards> {
     }
   }
 
+  Future<void> deleteCartItem(int cartItemId) async {
+    try {
+      await Supabase.instance.client
+        .from('cart_items')
+        .delete()
+        .eq('id', cartItemId);
+
+       setState(() {
+        cartItems.removeWhere((item) => item['id'] == cartItemId);
+      });
+
+      widget.onCartItemsChanged(cartItems);
+    } catch (e) {
+      print('Error deleting cart item: $e');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to delete item: ${e.toString()}')));
+    }
+  }
+
   void setupRealtimeListener() {
     _channel = Supabase.instance.client
         .channel('public:cart_items')
@@ -1318,7 +1353,21 @@ class _CartCardsState extends State<CartCards> {
             schema: 'public',
             table: 'cart_items',
             callback: (payload) {
-              fetchCartItems();
+              // Only fetch if it's a delete or insert event
+              if (payload.eventType == 'DELETE' || payload.eventType == 'INSERT') {
+                fetchCartItems();
+              } else {
+                // For updates, just update the specific item
+                final updatedItem = payload.newRecord;
+                if (updatedItem != null) {
+                  setState(() {
+                    final index = cartItems.indexWhere((item) => item['id'] == updatedItem['id']);
+                    if (index != -1) {
+                      cartItems[index] = updatedItem;
+                    }
+                  });
+                }
+              }
             })
         .subscribe();
   }
@@ -1342,7 +1391,6 @@ class _CartCardsState extends State<CartCards> {
       } else {
         selectedCartItemIds.add(cartItemId);
       }
-      print('Toggled selection. New selected IDs: $selectedCartItemIds');
       widget.onSelectionChanged(selectedCartItemIds);
     });
   }
@@ -1352,11 +1400,7 @@ class _CartCardsState extends State<CartCards> {
     if (isLoading) {
       return Center(child: CircularProgressIndicator());
     }
-    return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 1,
-        childAspectRatio: 3,
-      ), 
+    return ListView.builder( // Changed from GridView to ListView
       padding: EdgeInsets.symmetric(horizontal: 8),
       itemCount: cartItems.length,
       itemBuilder: (context, index) {
@@ -1371,20 +1415,21 @@ class _CartCardsState extends State<CartCards> {
           onQuantityChanged: updateCartItemQuantity,
           isSelected: selectedCartItemIds.contains(cartItemId),
           onSelected: () => toggleSelection(cartItemId),
+          onDelete: () => deleteCartItem(cartItemId),
         );
       }
     );
-
   }
 }
 
-class CartCard extends StatelessWidget {
+class CartCard extends StatefulWidget {
   final Food food;
   final int cartItemId;
   final int quantity;
   final Function(int, int) onQuantityChanged;
   final bool isSelected;
   final VoidCallback onSelected;
+  final VoidCallback onDelete;
 
   const CartCard({
     required this.food,
@@ -1393,14 +1438,38 @@ class CartCard extends StatelessWidget {
     required this.onQuantityChanged,
     required this.isSelected,
     required this.onSelected,
+    required this.onDelete,
     Key? key,
   }) : super(key: key);
+
+  @override
+  State<CartCard> createState() => _CartCardState();
+}
+
+class _CartCardState extends State<CartCard> {
+  late double totalPrice;
+
+  @override
+  void initState() {
+    super.initState();
+    totalPrice = widget.food.price * widget.quantity;
+  }
+
+  @override
+  void didUpdateWidget(CartCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.quantity != widget.quantity) {
+      setState(() {
+        totalPrice = widget.food.price * widget.quantity;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
-    double imageHeight = screenHeight * 0.13;
+    double imageHeight = screenHeight * 0.09;
     double imageWidth = screenWidth * 0.25;
     double titleFontSize = screenWidth * 0.045;
     double subtitleFontSize = screenWidth * 0.04;
@@ -1424,7 +1493,7 @@ class CartCard extends StatelessWidget {
                     width: imageWidth,
                     height: imageHeight,
                     child: Image.network(
-                      food.imageUrl ?? '',
+                      widget.food.imageUrl ?? '',
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
@@ -1435,19 +1504,19 @@ class CartCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                // Name text below the container
                 Padding(
                   padding: const EdgeInsets.fromLTRB(4, 12, 0, 0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        food.product_name,
+                        widget.food.product_name,
                         style: TextStyle(
                             fontFamily: 'Inter', fontSize: titleFontSize),
                       ),
                       Text(
-                        '₱${food.price.toStringAsFixed(2)}',
+                        '₱${totalPrice.toStringAsFixed(2)}',
                         style: TextStyle(
                             fontFamily: 'Inter', fontSize: subtitleFontSize),
                       ),
@@ -1464,17 +1533,26 @@ class CartCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Checkbox(
-                  value: isSelected,
-                  onChanged: (_) => onSelected(),
+                Row(
+                  children: [
+                    Checkbox(
+                      value: widget.isSelected,
+                      onChanged: (_) => widget.onSelected(),
+                    ),
+                    IconButton(
+                      onPressed: widget.onDelete,
+                      icon: Icon(Icons.delete),
+                    ),
+                  ],
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 0, 8, 4),
                   child: AddRemoveButton(
-                      initialValue: quantity,
-                      onChanged: (int value) {
-                        onQuantityChanged(cartItemId, value);
-                      }),
+                    initialValue: widget.quantity,
+                    onChanged: (int value) {
+                      widget.onQuantityChanged(widget.cartItemId, value);
+                    },
+                  ),
                 ),
               ],
             ),

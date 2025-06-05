@@ -22,6 +22,7 @@ class _CustomerCheckoutPageState extends State<CustomerCheckoutPage> {
   Map<String, dynamic>? userProfile;
   String? deliveryAddress;
   String? userId;
+  DateTime? deliveryDate;
 
   @override
   void initState() {
@@ -42,9 +43,29 @@ class _CustomerCheckoutPageState extends State<CustomerCheckoutPage> {
 
     if (result != null && result is String) {
       setState(() {
-        
         deliveryAddress = result;
       });
+    }
+  }
+
+  Future<void> pickDeliveryDate() async {
+    try {
+      final result = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime.now(),
+        lastDate: DateTime.now().add(Duration(days: 30)),
+      );
+      if (result != null) {
+        setState(() {
+          deliveryDate = result;
+        });
+      }
+    } catch (e) {
+      print('Error picking date: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to pick delivery date. Please try again.'))
+      );
     }
   }
 
@@ -88,6 +109,7 @@ class _CustomerCheckoutPageState extends State<CustomerCheckoutPage> {
           'delivery_address': deliveryAddress,
           'order_status': 'Pending',
           'order_date': DateTime.now().toIso8601String(),
+          'delivery_date': deliveryDate!.toIso8601String(),
           'order_total': calculateTotal(),
         })
         .select()
@@ -190,6 +212,22 @@ class _CustomerCheckoutPageState extends State<CustomerCheckoutPage> {
                       ),
                     ),
                   ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 12, bottom: 8),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: ElevatedButton(
+                  onPressed: pickDeliveryDate,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: c_white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text('Pick Delivery Date', style: TextStyle(color: c_pri_yellow, fontSize: 12),),
                 ),
               ),
             ),
