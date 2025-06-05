@@ -3,6 +3,7 @@ import 'package:foodie_app/UI_pages/Templates/AddIngredient_Form.dart';
 import 'package:foodie_app/Utilities/color_palette.dart';
 import '../../Utilities/utilities_cards.dart';
 import '../../Utilities/utilities_buttons.dart';
+import '../../Utilities/utilities_others.dart';
 import 'ad_ProfilePage.dart';
 
 class AdminIngredientsTab extends StatelessWidget {
@@ -33,22 +34,21 @@ class AdminIngredientsTab extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 0, 0, 4),
-                  child: Text('Categories', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                ),
-                // Horizontal scrolling cards with fixed height
-                Container(
-                  height: 80,
-                  child: IngredientCategoryCards(),
-                ),
-                Padding(
                   padding: const EdgeInsets.fromLTRB(12, 4, 0, 4),
                   child: Text('Ingredients Available', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
                 // Vertical scrolling grid that takes remaining space
                 Expanded(
-                  child: AdminIngredientCards(),
-                ),
+                    child: CustomTabBar(
+                  tabLabels: ['Vegetables', 'Protein', 'Liquids', 'Condiments', 'Baking Essentials'],
+                  tabContents: [
+                    AdminIngredientCards(categoryFilter: 'Vegetables'),
+                    AdminIngredientCards(categoryFilter: 'Protein'),
+                    AdminIngredientCards(categoryFilter: 'Liquids'),
+                    AdminIngredientCards(categoryFilter: 'Condiments'),
+                    AdminIngredientCards(categoryFilter: 'Baking Essentials'),
+                  ],
+                )),
                 
               ],
             ),
