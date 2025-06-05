@@ -35,13 +35,16 @@ class IngredientQuantityInput extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          flex: 2,
+          flex: 1,
           child: DropdownButtonFormField<Ingredient>(
             value: selectedIngredient,
             items: uniqueIngredients.map((ingredient) {
               return DropdownMenuItem<Ingredient>(
                 value: ingredient,
-                child: Text(ingredient.name),
+                child: Text(
+                  ingredient.name,
+                  overflow: TextOverflow.ellipsis,
+                ),
               );
             }).toList(),
             onChanged: onIngredientChanged,
@@ -57,21 +60,32 @@ class IngredientQuantityInput extends StatelessWidget {
                 borderSide: BorderSide(color: c_pri_yellow),
               ),
             ),
+            isExpanded: true,
           ),
         ),
         const SizedBox(width: 16),
         Expanded(
           flex: 1,
-          child: AddRemoveButton(
-            initialValue: int.tryParse(quantity ?? '0') ?? 0,
-            onChanged: onQuantityChanged
-          )
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              AddRemoveButton(
+                initialValue: int.tryParse(quantity ?? '0') ?? 0,
+                onChanged: onQuantityChanged
+              ),
+              IconButton(
+                onPressed: onRemove, 
+                icon: Icon(Icons.remove_circle),
+                color: c_pri_yellow,
+                constraints: BoxConstraints(
+                  minWidth: 40,
+                  minHeight: 40,
+                ),
+                padding: EdgeInsets.zero,
+              ),
+            ],
+          ),
         ),
-        IconButton(
-          onPressed: onRemove, 
-          icon: Icon(Icons.remove_circle),
-          color: c_pri_yellow,
-        )
       ],
     );
   }
