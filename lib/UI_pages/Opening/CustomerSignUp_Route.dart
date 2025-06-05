@@ -37,55 +37,79 @@ class _SignUpRoute_1stState extends State<SignUpRoute_1st> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0, left: 0), // already padded horizontally
-                child: YellowBackButton(),
-              ),
-              const SizedBox(height: 16),
-              TitleText(title: 'Foodie', color: c_pri_yellow),
-              Heading3_Text(text: 'Welcome!', color: c_pri_yellow),
-              bodyText(text: 'Create your account', color: c_pri_yellow),
-              const SizedBox(height: 25),
-              InputTextField(hintText: 'First Name', controller: _firstNameController),
-              const SizedBox(height: 25),
-              InputTextField(hintText: 'Middle Name', controller: _middleNameController),
-              const SizedBox(height: 25),
-              InputTextField(hintText: 'Last Name', controller: _lastNameController),
-              const SizedBox(height: 25),
-              InputTextField(hintText: 'Suffix (Optional)', controller: _suffixController),
-              const SizedBox(height: 25),
-              InputTextField(hintText: 'Phone Number', controller: _phoneController),
-              const SizedBox(height: 25),
-              InputTextField(hintText: 'Email', controller: _emailController),
-              const SizedBox(height: 25),
-              ActionButton(
-                buttonName: 'Next',
-                backgroundColor: c_pri_yellow,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SignUpRoute_2nd(
-                        email: _emailController.text.trim(),
-                        firstName: _firstNameController.text.trim(),
-                        middleName: _middleNameController.text.trim(),
-                        lastName: _lastNameController.text.trim(),
-                        suffix: _suffixController.text.trim(),
-                        phone: _phoneController.text.trim(),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'lib/images/foodie_bg.png',
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
+          SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0, left: 8),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: YellowBackButton(),
+                  ),
+                ),
+                TitleText(title: 'Foodie', color: c_pri_yellow),
+                Heading3_Text(text: 'Welcome!', color: c_pri_yellow),
+                bodyText(text: 'Create your account', color: c_pri_yellow),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        InputTextField(hintText: 'First Name', labelText: 'First Name', controller: _firstNameController),
+                        const SizedBox(height: 15),
+                        InputTextField(hintText: 'Middle Name', labelText: 'Middle Name', controller: _middleNameController),
+                        const SizedBox(height: 15),
+                        InputTextField(hintText: 'Last Name', labelText: 'Last Name', controller: _lastNameController),
+                        const SizedBox(height: 15),
+                        InputTextField(hintText: 'Suffix (Optional)', labelText: 'Suffix', controller: _suffixController),
+                        const SizedBox(height: 15),
+                        InputTextField(hintText: 'Phone Number', labelText: 'Phone Number', controller: _phoneController),
+                        const SizedBox(height: 15),
+                        InputTextField(hintText: 'Email', labelText: 'Email', controller: _emailController),
+                        const SizedBox(height: 80),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            left: 16,
+            right: 16,
+            bottom: 16,
+            child: NormalButton(
+            buttonName: 'Next',
+            backgroundColor: c_pri_yellow,
+            fontColor: c_white,
+            onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SignUpRoute_2nd(
+                      email: _emailController.text.trim(),
+                      firstName: _firstNameController.text.trim(),
+                      middleName: _middleNameController.text.trim(),
+                      lastName: _lastNameController.text.trim(),
+                      suffix: _suffixController.text.trim(),
+                      phone: _phoneController.text.trim(),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -194,47 +218,73 @@ class _SignUpRoute_2ndState extends State<SignUpRoute_2nd> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0, left: 0),
-                child: YellowBackButton(),
-              ),
-              const SizedBox(height: 16),
-              TitleText(title: 'Foodie', color: c_pri_yellow),
-              Heading3_Text(text: 'Welcome!', color: c_pri_yellow),
-              bodyText(text: 'Create your account', color: c_pri_yellow),
-              const SizedBox(height: 25),
-              InputTextField(
-                hintText: 'Email',
-                controller: _emailController,
-                obscureText: false,
-              ),
-              const SizedBox(height: 25),
-              InputTextField(
-                hintText: 'Password',
-                controller: _passwordController,
-                obscureText: true,
-              ),
-              const SizedBox(height: 25),
-              InputTextField(
-                hintText: 'Confirm Password',
-                controller: _confirmPasswordController,
-                obscureText: true,
-              ),
-              const SizedBox(height: 25),
-              ActionButton(
-                buttonName: 'Sign Up',
-                backgroundColor: c_pri_yellow,
-                onPressed: _handleSignUp,
-              ),
-            ],
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'lib/images/foodie_bg.png',
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
+          SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0, left: 8),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: YellowBackButton(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                    TitleText(title: 'Foodie', color: c_pri_yellow),
+                    Heading3_Text(text: 'Welcome!', color: c_pri_yellow),
+                    bodyText(text: 'Create your account', color: c_pri_yellow),
+                const SizedBox(height: 16),
+                Container(
+                  width: double.infinity,
+                  margin: EdgeInsets.zero,  
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(height: 15),
+                      InputTextField(
+                        hintText: 'Email',
+                        labelText: 'Email',
+                        controller: _emailController,
+                        obscureText: false,
+                      ),
+                      const SizedBox(height: 15),
+                      InputTextField(
+                        hintText: 'Password',
+                        labelText: 'Password',
+                        controller: _passwordController,
+                        obscureText: true,
+                      ),
+                      const SizedBox(height: 15),
+                      InputTextField(
+                        hintText: 'Confirm Password',
+                        labelText: 'Confirm Password',
+                        controller: _confirmPasswordController,
+                        obscureText: true,
+                      ),
+                      const SizedBox(height: 25),
+                      NormalButton(
+                        buttonName: 'Sign Up',
+                        fontColor: c_white,
+                        backgroundColor: c_pri_yellow,
+                        onPressed: _handleSignUp,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

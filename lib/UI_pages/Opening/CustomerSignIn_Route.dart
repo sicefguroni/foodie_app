@@ -113,11 +113,16 @@ class _CustomerSignInRouteState extends State<CustomerSignInRoute> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: Stack(
         children: [
+          Positioned.fill(
+            child: Image.asset(
+              'lib/images/foodie_bg.png',
+              fit: BoxFit.cover,
+            ),
+          ),
           Padding(
-            padding: const EdgeInsets.only(
-                top: 16.0, left: 0), // already padded horizontally
+            padding: const EdgeInsets.all(4.0),
             child: YellowBackButton(),
           ),
           TitleText(title: 'Foodie', color: c_pri_yellow),
