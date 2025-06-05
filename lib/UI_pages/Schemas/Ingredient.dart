@@ -21,7 +21,6 @@ class Ingredient {
       unit: json['unit'] ?? '',
       category: json['category'] ?? '',
       quantity: json['quantity'] ?? '',
-      imageUrl: json['image_url'] ?? '', // Adjust field names based on your Supabase table
     );
   }
 

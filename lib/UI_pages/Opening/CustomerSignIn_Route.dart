@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:foodie_app/UI_pages/Customer/Customer_Page.dart';
-import 'package:foodie_app/UI_pages/Opening/CustomerSignUp_Route.dart';
 import 'package:foodie_app/Utilities/color_palette.dart';
 import '../../Utilities/utilities_buttons.dart';
 import '../../Utilities/utilities_texts.dart';
@@ -15,30 +14,47 @@ class CustomerSignInRoute extends StatefulWidget {
 }
 
 class _CustomerSignInRouteState extends State<CustomerSignInRoute> {
-  // get auth service
   final authService = AuthService();
 
-  // text controllerse
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  
+  // Add error message state
+  String? _errorMessage;
 
-  // Sign In button pressed
   void login() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
-    if (email.isEmpty || password.isEmpty) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please enter email and password')),
-        );
-      }
+    // Clear previous error message
+    setState(() {
+      _errorMessage = null;
+    });
+
+    // Input validation
+    if (email.isEmpty && password.isEmpty) {
+      setState(() {
+        _errorMessage = '*Please enter email and password';
+      });
+      return;
+    }
+    
+    if (email.isEmpty) {
+      setState(() {
+        _errorMessage = '*Please enter email';
+      });
+      return;
+    } 
+    
+    if (password.isEmpty) {
+      setState(() {
+        _errorMessage = '*Please enter password';
+      });
       return;
     }
 
     try {
-      final response =
-          await authService.signInWithEmailPassword(email, password);
+      final response = await authService.signInWithEmailPassword(email, password);
       final user = response.user;
 
       if (user != null) {
@@ -51,7 +67,6 @@ class _CustomerSignInRouteState extends State<CustomerSignInRoute> {
             .maybeSingle();
 
         if (customer != null) {
-          // Navigate to CustomerPage
           if (mounted) {
             Navigator.pushReplacement(
               context,
@@ -59,31 +74,42 @@ class _CustomerSignInRouteState extends State<CustomerSignInRoute> {
             );
           }
         } else {
-          // Not a customer: sign out and show error
           await authService.signOut();
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Access denied: Account is not a customer.')),
-            );
-          }
+          setState(() {
+            _errorMessage = 'Access denied: Account is not a customer';
+          });
         }
       } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Login failed. Account does not exist.')),
-          );
-        }
+        setState(() {
+          _errorMessage = 'Login failed. Account does not exist';
+        });
       }
+    } on AuthApiException catch (e) {
+      // Handle specific authentication errors
+      String errorMessage;
+      
+      if (e.statusCode == '400') {
+        // Invalid email or password
+        errorMessage = 'Invalid email or password';
+      } else if (e.statusCode == '422') {
+        // Email not confirmed or other validation errors
+        errorMessage = 'Please check your email and password';
+      } else {
+        // Other auth errors
+        errorMessage = 'Login failed. Please try again';
+      }
+      
+      setState(() {
+        _errorMessage = errorMessage;
+      });
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
+      // Handle other general errors
+      setState(() {
+        _errorMessage = 'An error occurred. Please try again';
+      });
     }
   }
 
-  // UI Part
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,98 +125,48 @@ class _CustomerSignInRouteState extends State<CustomerSignInRoute> {
             padding: const EdgeInsets.all(4.0),
             child: YellowBackButton(),
           ),
+          TitleText(title: 'Foodie', color: c_pri_yellow),
+          Heading3_Text(text: 'Welcome Back!', color: c_pri_yellow),
+          bodyText(text: 'Sign in to your Account', color: c_pri_yellow),
+          const SizedBox(height: 75),
           Container(
             width: double.infinity,
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-            margin: EdgeInsets.symmetric(horizontal: 0, vertical: 64),
+            margin: EdgeInsets.zero,
+            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                TitleText(title: 'Foodie', color: c_pri_yellow),
-                Heading3_Text(text: 'Welcome to Foodie!', color: c_pri_yellow),
-                bodyText(text: 'Sign in your account', color: c_pri_yellow),
-              ],
-            ),
-          ),
-          SafeArea(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  
-                  const SizedBox(height: 50),
-                  Container(
-                    width: double.infinity,
-                    margin: EdgeInsets.zero,
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        InputTextField(
-                            hintText: 'Email',
-                            labelText: 'Email',
-                            controller: _emailController,
-                            obscureText: false),
-                        const SizedBox(height: 15),
-                        InputTextField(
-                            hintText: 'Password',
-                            labelText: 'Password',
-                            controller: _passwordController,
-                            isPassword: true),
-                        const SizedBox(height: 25),
-                        NormalButton(
-                          buttonName: 'Sign In',
-                          backgroundColor: c_pri_yellow,
-                          fontColor: c_white,
-                          onPressed: login,
-                        ),
-                        Center(
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => SignUpRoute_1st()),
-                              );
-                            },
-                            child: MouseRegion(
-                              cursor: SystemMouseCursors.click,
-                              child: Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: RichText(
-                                  text: TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: "Don't have an account? ",
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontFamily: 'Poppins',
-                                          fontSize: 12
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: "Sign Up",
-                                        style: TextStyle(
-                                          color: c_pri_yellow,
-                                          fontFamily: 'Poppins',
-                                          decoration: TextDecoration.underline,
-                                          decorationColor: c_pri_yellow,
-                                          fontSize: 12
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                InputTextField(
+                    hintText: 'Email',
+                    controller: _emailController,
+                    obscureText: false),
+                const SizedBox(height: 25),
+                InputTextField(
+                    hintText: 'Password',
+                    controller: _passwordController,
+                    obscureText: true),
+                
+                // Error message display
+                if (_errorMessage != null) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    _errorMessage!,
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
-              ),        
+                
+                const SizedBox(height: 25),
+                ActionButton(
+                  buttonName: 'Sign In',
+                  backgroundColor: c_pri_yellow,
+                  onPressed: login,
+                ),
+              ],
             ),
           ),
         ],
