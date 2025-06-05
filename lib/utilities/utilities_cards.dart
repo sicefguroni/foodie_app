@@ -233,6 +233,13 @@ class _FoodCategoryCardState extends State<FoodCategoryCard> {
 // FOUND IN ad_IngredientsTab
 // Updated AdminIngredientCards with proper error handling
 class AdminIngredientCards extends StatefulWidget {
+  final String categoryFilter;
+
+  const AdminIngredientCards({
+    required this.categoryFilter,
+    Key? key,
+  }) : super(key: key);
+
   @override
   State<AdminIngredientCards> createState() => _AdminIngredientCardsState();
 }
@@ -250,6 +257,14 @@ class _AdminIngredientCardsState extends State<AdminIngredientCards> {
   }
 
   @override
+  void didUpdateWidget(covariant AdminIngredientCards oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.categoryFilter != widget.categoryFilter) {
+      fetchIngredients();
+    }
+  }
+
+  @override
   void dispose() {
     // Clean up the subscription when widget is disposed
     _channel?.unsubscribe();
@@ -261,6 +276,7 @@ class _AdminIngredientCardsState extends State<AdminIngredientCards> {
       final response = await Supabase.instance.client
           .from('ingredients')
           .select('*')
+          .eq('category', widget.categoryFilter)
           .order('name', ascending: true);
 
       print('Supabase response: $response');
@@ -477,6 +493,12 @@ class AdminIngredientCard extends StatelessWidget {
 // FOUND IN ad_FoodTab
 // FOUND IN ad_FoodTab
 class AdminFoodCards extends StatefulWidget {
+  final String categoryFilter;
+
+  const AdminFoodCards({
+    required this.categoryFilter,
+    Key? key,
+  }) : super(key: key);
   @override
   State<AdminFoodCards> createState() => _AdminFoodCardsState();
 }
@@ -494,6 +516,14 @@ class _AdminFoodCardsState extends State<AdminFoodCards> {
   }
 
   @override
+  void didUpdateWidget(covariant AdminFoodCards oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.categoryFilter != widget.categoryFilter) {
+      fetchFoods();
+    }
+  }
+
+  @override
   void dispose() {
     _channel?.unsubscribe();
     super.dispose();
@@ -504,6 +534,7 @@ class _AdminFoodCardsState extends State<AdminFoodCards> {
       final response = await Supabase.instance.client
           .from('products')
           .select('*')
+          .eq('category', widget.categoryFilter)
           .order('product_name', ascending: true);
 
       print('Supabase response: $response');
@@ -519,6 +550,7 @@ class _AdminFoodCardsState extends State<AdminFoodCards> {
       });
     }
   }
+  
 
   void setupRealtimeListener() {
     _channel = Supabase.instance.client
@@ -577,6 +609,7 @@ class AdminFoodCard extends StatelessWidget {
     double imageHeight = screenHeight * 0.13;
     double titleFontSize = screenWidth * 0.04;
     double subtitleFontSize = screenWidth * 0.04;
+    double iconButtonSize = screenWidth * 0.07;
 
     return Card(
       elevation: 1,
@@ -622,6 +655,54 @@ class AdminFoodCard extends StatelessWidget {
                   style: TextStyle(
                       fontFamily: 'Inter', fontSize: subtitleFontSize),
                 ),
+                IconButton(
+                  icon: Icon(Icons.delete, size: iconButtonSize),
+                  padding: EdgeInsets.zero,
+                  visualDensity: VisualDensity.compact,
+                  color: c_pri_yellow,
+                onPressed: () async {
+                    final client = Supabase.instance.client;
+
+                    try {
+                      // Delete all recipes using this product (assuming FK: recipe.product_id → products.id)
+                      final recipeResponse = await client
+                          .from('recipes')
+                          .delete()
+                          .eq('recipes.product_id', food.id);
+
+                      if (recipeResponse.error != null) {
+                        throw Exception(
+                            'Failed to delete related recipes: ${recipeResponse.error!.message}');
+                      }
+
+                      // Delete the product itself
+                      final productResponse = await client
+                          .from('products')
+                          .delete()
+                          .eq('id', food.id);
+
+                      if (productResponse.error != null) {
+                        throw Exception(
+                            'Failed to delete product: ${productResponse.error!.message}');
+                      }
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              '${food.product_name} deleted successfully.'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Deletion error: ${e.toString()}'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  },
+                ),
               ],
             ),
           )
@@ -634,6 +715,13 @@ class AdminFoodCard extends StatelessWidget {
 // FOUND IN cust_HomeTab
 // FOUND IN cust_HomeTab
 class CustomerFoodCards extends StatefulWidget {
+  final String categoryFilter;
+
+  const CustomerFoodCards({
+    required this.categoryFilter,
+    Key? key,
+  }) : super(key: key);
+
   @override
   State<CustomerFoodCards> createState() => _CustomerFoodCardsState();
 }
@@ -651,6 +739,14 @@ class _CustomerFoodCardsState extends State<CustomerFoodCards> {
   }
 
   @override
+  void didUpdateWidget(covariant CustomerFoodCards oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.categoryFilter != widget.categoryFilter) {
+      fetchFoods();
+    }
+  }
+
+  @override
   void dispose() {
     _channel?.unsubscribe();
     super.dispose();
@@ -661,6 +757,7 @@ class _CustomerFoodCardsState extends State<CustomerFoodCards> {
       final response = await Supabase.instance.client
           .from('products')
           .select('*')
+          .eq('category', widget.categoryFilter)
           .order('created_at', ascending: false);
 
       print('Supabase response: $response');
