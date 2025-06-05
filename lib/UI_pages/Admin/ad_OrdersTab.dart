@@ -4,6 +4,7 @@ import '../../Utilities/utilities_cards.dart';
 import '../../Utilities/utilities_buttons.dart';
 import '../../Utilities/utilities_others.dart';
 import 'ad_ProfilePage.dart';
+import 'ad_DeniedTab.dart';
 
 class AdminOrdersTab extends StatelessWidget {
   @override
@@ -20,9 +21,13 @@ class AdminOrdersTab extends StatelessWidget {
                 color: c_pri_yellow,
               ),
               left: IconButton(
-                onPressed: () {},
                 icon: Icon(Icons.delete),
                 color: c_pri_yellow,
+                onPressed: () {
+                  Navigator.push(context, 
+                    MaterialPageRoute(builder: (context) => AdDeniedOrdersTab())
+                  );
+                },
               ),
               right: IconButton(
                 onPressed: () {},
