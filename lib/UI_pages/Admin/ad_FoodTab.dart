@@ -3,6 +3,7 @@ import 'package:foodie_app/UI_pages/Templates/AddFood_Form.dart';
 import 'package:foodie_app/Utilities/color_palette.dart';
 import '../../Utilities/utilities_cards.dart';
 import '../../Utilities/utilities_buttons.dart';
+import '../../Utilities/utilities_others.dart';
 import 'ad_ProfilePage.dart';
 
 class AdminFoodTab extends StatelessWidget {
@@ -34,22 +35,20 @@ class AdminFoodTab extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(12, 0, 0, 4),
-                  child: Text('Categories=', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                ),
-                // Horizontal scrolling cards with fixed height
-                Container(
-                  height: 80,
-                  child: FoodCategoryCards(),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 4, 0, 4),
                   child: Text('Food Available', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
-                // Vertical scrolling grid that takes remaining space
+                // Horizontal scrolling cards with fixed height
                 Expanded(
-                  child: AdminFoodCards(),
+                  child: CustomTabBar(
+                    tabLabels: ['Mains', 'Appetizers', 'Pastries', 'Beverages'],
+                tabContents: [
+                  AdminFoodCards(categoryFilter: 'Mains'),
+                  AdminFoodCards(categoryFilter: 'Appetizers'),
+                  AdminFoodCards(categoryFilter: 'Pastries'),
+                  AdminFoodCards(categoryFilter: 'Beverages'),
+                  ],
+                  )
                 ),
-               
               ],
             ),
             Positioned(

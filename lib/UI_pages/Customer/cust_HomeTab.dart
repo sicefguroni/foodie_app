@@ -42,9 +42,9 @@ class _CustomerHomeTabState extends State<CustomerHomeTab> {
   Future<void> fetchFoods() async {
     try {
       final response = await Supabase.instance.client
-        .from('products')
-        .select('*')
-        .order('product_name', ascending: true);
+          .from('products')
+          .select('*')
+          .order('product_name', ascending: true);
 
       print('Supabase response: $response');
 
@@ -62,19 +62,19 @@ class _CustomerHomeTabState extends State<CustomerHomeTab> {
 
   void setupRealtimeListener() {
     _channel = Supabase.instance.client
-      .channel('public:products')
-      .onPostgresChanges(
-        event: PostgresChangeEvent.all, 
-        schema: 'public',
-        table: 'products',
-        callback: (payload) {
-          fetchFoods();
-          // If currently searching, update search results too
-          if (_isSearching && _searchController.text.isNotEmpty) {
-            _performSearch(_searchController.text);
-          }
-        })
-      .subscribe();
+        .channel('public:products')
+        .onPostgresChanges(
+            event: PostgresChangeEvent.all,
+            schema: 'public',
+            table: 'products',
+            callback: (payload) {
+              fetchFoods();
+              // If currently searching, update search results too
+              if (_isSearching && _searchController.text.isNotEmpty) {
+                _performSearch(_searchController.text);
+              }
+            })
+        .subscribe();
   }
 
   void _performSearch(String query) {
@@ -86,9 +86,13 @@ class _CustomerHomeTabState extends State<CustomerHomeTab> {
         _isSearching = true;
         _searchResults = _allFoods.where((food) {
           // Adjust these field names based on your Food model structure
-          return food.product_name.toLowerCase().contains(query.toLowerCase()) ||
-                 (food.category?.toLowerCase().contains(query.toLowerCase()) ?? false) ||
-                 (food.description?.toLowerCase().contains(query.toLowerCase()) ?? false);
+          return food.product_name
+                  .toLowerCase()
+                  .contains(query.toLowerCase()) ||
+              (food.category?.toLowerCase().contains(query.toLowerCase()) ??
+                  false) ||
+              (food.description?.toLowerCase().contains(query.toLowerCase()) ??
+                  false);
         }).toList();
       }
     });
@@ -104,7 +108,7 @@ class _CustomerHomeTabState extends State<CustomerHomeTab> {
 
   Widget _buildSearchResults() {
     if (!_isSearching) return SizedBox.shrink();
-    
+
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
@@ -238,12 +242,10 @@ class _CustomerHomeTabState extends State<CustomerHomeTab> {
           children: [
             Container(
               decoration: BoxDecoration(
-                color: c_pri_yellow,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(16), 
-                  bottomRight: Radius.circular(16)
-                )
-              ),
+                  color: c_pri_yellow,
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(16),
+                      bottomRight: Radius.circular(16))),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -252,13 +254,18 @@ class _CustomerHomeTabState extends State<CustomerHomeTab> {
                       icon: Icon(Icons.shopping_cart),
                       color: c_white,
                       onPressed: () {
-                        Navigator.push(context, 
-                          MaterialPageRoute(builder: (context) => CustomerCartPage())
-                        );
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CustomerCartPage()));
                       },
                     ),
-                    right: IconButton(onPressed: () {}, icon: Icon(Icons.notifications), color: c_white),
-                    rightmost: ProfileButton(iconColor: c_white, 
+                    right: IconButton(
+                        onPressed: () {},
+                        icon: Icon(Icons.notifications),
+                        color: c_white),
+                    rightmost: ProfileButton(
+                      iconColor: c_white,
                       onPressed: () {
                         return CustomerProfilePage();
                       },
@@ -278,7 +285,7 @@ class _CustomerHomeTabState extends State<CustomerHomeTab> {
                 ],
               ),
             ),
-            
+
             // Loading indicator
             if (_isLoading)
               Expanded(
@@ -289,29 +296,26 @@ class _CustomerHomeTabState extends State<CustomerHomeTab> {
             else ...[
               // Search results overlay
               _buildSearchResults(),
-              
+
               // Only show category and picks when not searching
               if (!_isSearching) ...[
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 8, 0, 4),
-                  child: Text('Category', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                ),
-                // Horizontal scrolling cards with fixed height
-                Container(
-                  height: 80,
-                  child: FoodCategoryCards(),
-                ),
-                Padding(
                   padding: const EdgeInsets.fromLTRB(12, 4, 0, 4),
-                  child: Text('Picks for you', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  child: Text('Picks for you',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
                 // Vertical scrolling grid that takes remaining space
                 Expanded(
-                  child: CustomerFoodCards(),
-                ),
-              ] else ...[
-                // When searching, give search results more space
-                SizedBox(height: 16),
+                    child: CustomTabBar(
+                  tabLabels: ['Mains', 'Appetizers', 'Pastries', 'Beverages'],
+                  tabContents: [
+                    CustomerFoodCards(categoryFilter: 'Mains'),
+                    CustomerFoodCards(categoryFilter: 'Appetizers'),
+                    CustomerFoodCards(categoryFilter: 'Pastries'),
+                    CustomerFoodCards(categoryFilter: 'Beverages'),
+                  ],
+                )),
               ],
             ],
           ],
