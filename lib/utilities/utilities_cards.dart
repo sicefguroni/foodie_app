@@ -1566,7 +1566,7 @@ class _CheckoutCardState extends State<CheckoutCard> {
               ],
             ),
           ),
-        ],S
+        ],
       ),
     );
   }
