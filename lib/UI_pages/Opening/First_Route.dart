@@ -28,7 +28,7 @@ class FirstRoute extends StatelessWidget {
             Positioned(
               left: 24,
               right: 24,
-              bottom: 16,
+              bottom: 24,
               child: ActionButton(
                 buttonName: 'Order Now',
                 backgroundColor: c_pri_yellow,
